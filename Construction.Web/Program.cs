@@ -1,9 +1,11 @@
 using Construction.Business.Abstract;
 using Construction.Business.Concrete;
+using Construction.Business.ValidatonRules;
 using Construction.DataAccess.Abstract;
 using Construction.DataAccess.Concrete;
 using Construction.DataAccess.Context;
 using Construction.Entity.Entities;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +16,9 @@ builder.Services.AddDbContext<ConstructionDbContext>(options =>
 
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ConstructionDbContext>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
+
 
 builder.Services.AddControllersWithViews();
 
@@ -33,6 +38,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseStatusCodePagesWithReExecute("/ErrorPage/Error404");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

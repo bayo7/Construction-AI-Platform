@@ -9,7 +9,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Kategori Listesi</h5>
-        <a href="/Admin/Category/Create" class="btn btn-primary">Yeni Kategori Ekle</a>
+        <a href="/Admin/Category/AddCategory" class="btn btn-primary">Yeni Kategori Ekle</a>
     </div>
 
     <div class="table-responsive text-nowrap">
@@ -47,8 +47,10 @@
                                 }
                             </td>
                             <td>
-                                <a href="/Admin/Category/Update/@item.Id" class="btn btn-sm btn-outline-info">Düzenle</a>
-                                <a href="/Admin/Category/Delete/@item.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                                <a href="/Admin/Category/UpdateCategory/@item.Id" class="btn btn-sm btn-outline-info">Düzenle</a>
+                                <a href="/Admin/Category/DeleteCategory/@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
+                                    <i class="bx bx-trash"></i> Sil
+                                </a>
                             </td>
                         </tr>
                     }
