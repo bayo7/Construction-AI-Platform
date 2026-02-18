@@ -9,6 +9,6 @@ namespace Construction.Business.Abstract
 {
     public interface IProjectService : IGenericService<Project>
     {
-
+        Task<List<Project>> GetProjectsWithCategory();
     }
 }

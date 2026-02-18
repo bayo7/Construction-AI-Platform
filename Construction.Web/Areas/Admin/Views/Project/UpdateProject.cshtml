@@ -1,0 +1,118 @@
+﻿@model Project
+
+@{
+    ViewData["Title"] = "Proje Güncelle";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Proje Düzenleme</h5>
+            </div>
+            <div class="card-body">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="text-danger mb-3 border p-3"></div>
+                }
+
+                <form method="post" action="/Admin/Project/UpdateProject" enctype="multipart/form-data">
+
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CreatedDate" /> <input type="hidden" asp-for="CoverImageUrl" /> <div class="mb-3">
+                        <label class="form-label" asp-for="Title">Proje Başlığı</label>
+                        <input type="text" class="form-control" asp-for="Title" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        @Html.DropDownListFor(x => x.CategoryId, (List<SelectListItem>)ViewBag.v, new { @class = "form-control" })
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Location">Lokasyon</label>
+                        <input type="text" class="form-control" asp-for="Location" />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" asp-for="MinPrice">Fiyat</label>
+                            <input type="number" class="form-control" asp-for="MinPrice" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tamamlanma Oranı: <span id="rangeVal">@Model.CompleetionRate</span>%</label>
+                            <input type="range" class="form-range" asp-for="CompleetionRate" min="0" max="100" id="updateRange">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" asp-for="ProjectStatus">Proje Durumu</label>
+                            <input type="text" class="form-control" asp-for="ProjectStatus" placeholder="Örn: Satışta, Teslim Edildi" />
+                            <span asp-validation-for="ProjectStatus" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mevcut Kapak Görseli</label> <br />
+                        <img src="/project-images/@Model.CoverImageUrl" style="height:100px; width:150px; object-fit:cover; border-radius:5px;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Yeni Görsel Seç (Değiştirmek İstemiyorsan Boş Bırak)</label>
+                        <input type="file" class="form-control" name="imageFile" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Description">Açıklama</label>
+                        <textarea class="form-control" asp-for="Description" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" asp-for="IsActive" id="isActiveSwitch" checked />
+
+                        <label class="form-check-label text-success" for="isActiveSwitch" id="isActiveLabel">
+                            Proje Yayında (Aktif)
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-warning">Güncelle</button>
+                    <a href="/Admin/Project/Index" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('updateRange').addEventListener('input', function (e) {
+        document.getElementById('rangeVal').innerText = e.target.value;
+    });
+</script>
+<script>
+    // 1. Elementleri seçiyoruz
+    const switchElement = document.getElementById('isActiveSwitch');
+    const labelElement = document.getElementById('isActiveLabel');
+
+    // 2. Değişiklik fonksiyonu
+    function updateSwitchLabel() {
+        if (switchElement.checked) {
+            // Eğer tikliyse:
+            labelElement.innerText = "Proje Yayında (Aktif)";
+            labelElement.classList.remove('text-danger'); // Kırmızıyı sil
+            labelElement.classList.add('text-success');   // Yeşil yap
+        } else {
+            // Eğer tikli değilse:
+            labelElement.innerText = "Proje Yayında Değil (Pasif)";
+            labelElement.classList.remove('text-success'); // Yeşili sil
+            labelElement.classList.add('text-danger');     // Kırmızı yap
+        }
+    }
+
+    // 3. Tıklanma olayını dinle (Her değiştiğinde çalışır)
+    switchElement.addEventListener('change', updateSwitchLabel);
+
+    // 4. Sayfa ilk açıldığında da çalıştır (Update sayfasında Pasif gelirse doğru görünsün diye)
+    // Create sayfasında zaten checked geliyor ama Update için bu satır önemli.
+    updateSwitchLabel();
+</script>

@@ -9,6 +9,6 @@ namespace Construction.DataAccess.Abstract
 {
     public interface IProjectDal : IGenericRepository<Project>
     {
-
+        Task<List<Project>> GetProjectsWithCategory();
     }
 }

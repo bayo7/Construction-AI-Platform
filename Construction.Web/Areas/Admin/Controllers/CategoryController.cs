@@ -39,7 +39,7 @@ namespace Construction.Web.Areas.Admin.Controllers
             if (result.IsValid)
             {
 
-                category.IsActive = true;
+                //category.IsActive = true;
                 category.CreatedDate = DateTime.Now;
 
                 await _categoryService.TInsertAsync(category);

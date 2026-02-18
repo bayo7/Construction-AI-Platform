@@ -44,5 +44,10 @@ namespace Construction.Business.Concrete
         {
             await _projectDal.UpdateAsync(entity);
         }
+
+        public async Task<List<Project>> GetProjectsWithCategory()
+        {
+            return await _projectDal.GetProjectsWithCategory();
+        }
     }
 }

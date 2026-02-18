@@ -1,0 +1,77 @@
+﻿@model List<Project>
+
+@{
+    ViewData["Title"] = "Projeler";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Proje Listesi</h5>
+        <a href="/Admin/Project/CreateProject" class="btn btn-primary">Yeni Proje Ekle</a>
+    </div>
+
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Proje Başlığı</th>
+                    <th>Kategori</th>
+                    <th>Lokasyon</th>
+                    <th>Fiyat (Min)</th>
+                    <th>Durum</th>
+                    <th>Tamamlanma</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+                @if (Model == null || Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center">Henüz veri yok.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td><strong>@item.Title</strong></td>
+
+                            <td>@item.Category?.CategoryName</td>
+
+                            <td>@item.Location</td>
+
+                            <td>@item.MinPrice.ToString("C0")</td>
+
+                            <td><span class="badge bg-label-info">@item.ProjectStatus</span></td>
+
+                            <td style="width: 15%">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">@item.CompleetionRate%</span>
+                                    <div class="progress w-100" style="height: 6px;">
+                                        <div class="progress-bar bg-success" role="progressbar"
+                                             style="width: @item.CompleetionRate%"
+                                             aria-valuenow="@item.CompleetionRate" aria-valuemin="0" aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <a href="/Admin/Project/UpdateProject/@item.Id" class="btn btn-warning btn-sm"><i class="bx bx-edit-alt"></i></a>
+                                <a href="/Admin/Project/DeleteProject/@item.Id"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Bu projeyi ve kapak fotoğrafını kalıcı olarak silmek istediğinize emin misiniz?');">
+                                    <i class="bx bx-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

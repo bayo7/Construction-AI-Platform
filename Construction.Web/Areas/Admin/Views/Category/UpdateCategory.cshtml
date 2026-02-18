@@ -27,13 +27,12 @@
                     <div class="mb-3">
                     </div>
 
-                    <div class="mb-3">
-                        <div class="form-check form-switch mb-2">
-                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" asp-for="IsActive" />
-                            <label class="form-check-label" for="flexSwitchCheckChecked">
-                                Kategori Aktif mi?
-                            </label>
-                        </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" asp-for="IsActive" id="isActiveSwitch" checked />
+
+                        <label class="form-check-label text-success" for="isActiveSwitch" id="isActiveLabel">
+                            Proje Yayında (Aktif)
+                        </label>
                     </div>
 
                     <button type="submit" class="btn btn-warning">Güncelle</button>
@@ -43,3 +42,30 @@
         </div>
     </div>
 </div>
+<script>
+    // 1. Elementleri seçiyoruz
+    const switchElement = document.getElementById('isActiveSwitch');
+    const labelElement = document.getElementById('isActiveLabel');
+
+    // 2. Değişiklik fonksiyonu
+    function updateSwitchLabel() {
+        if (switchElement.checked) {
+            // Eğer tikliyse:
+            labelElement.innerText = "Proje Yayında (Aktif)";
+            labelElement.classList.remove('text-danger'); // Kırmızıyı sil
+            labelElement.classList.add('text-success');   // Yeşil yap
+        } else {
+            // Eğer tikli değilse:
+            labelElement.innerText = "Proje Yayında Değil (Pasif)";
+            labelElement.classList.remove('text-success'); // Yeşili sil
+            labelElement.classList.add('text-danger');     // Kırmızı yap
+        }
+    }
+
+    // 3. Tıklanma olayını dinle (Her değiştiğinde çalışır)
+    switchElement.addEventListener('change', updateSwitchLabel);
+
+    // 4. Sayfa ilk açıldığında da çalıştır (Update sayfasında Pasif gelirse doğru görünsün diye)
+    // Create sayfasında zaten checked geliyor ama Update için bu satır önemli.
+    updateSwitchLabel();
+</script>

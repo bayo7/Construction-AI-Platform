@@ -15,13 +15,15 @@ namespace Construction.Entity.Entities
         public string ProjectStatus { get; set; }
 
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal MinPrice { get; set; }
-        public string CoverImageUrl { get; set; }
+        public string? CoverImageUrl { get; set; }
 
         public string? DetailsEmbedding { get; set; }
+
+        public int CompleetionRate { get; set; }
     }
 }
