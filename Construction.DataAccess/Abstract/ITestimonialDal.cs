@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Abstract
 {
-    public interface ICategoryDal : IGenericDal<Category>
+    public interface ITestimonialDal : IGenericDal<Testimonial>
     {
-
+        Task<List<Testimonial>> GetTestimonialsWithProjectAsync();
     }
 }

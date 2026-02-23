@@ -1,0 +1,92 @@
+﻿@model List<Testimonial>
+
+@{
+    ViewData["Title"] = "Müşteri Yorumları Yönetimi";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Müşteri Yorumları Yönetimi</h5>
+        <small class="text-muted">Buradan müşterilerin bıraktığı yorumları onaylayabilir veya silebilirsiniz.</small>
+    </div>
+
+    <div class="table-responsive text-nowrap">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ad Soyad</th>
+                    <th>İlgili Proje</th>
+                    <th>Puan</th>
+                    <th>Yorum Özeti</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody class="table-border-bottom-0">
+                @if (Model == null || Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">Henüz müşteri yorumu bulunmamaktadır.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.NameSurname</strong>
+                                <br />
+                                <small class="text-muted">@item.Title</small>
+                            </td>
+
+                            <td>
+                                @if (item.Project != null)
+                                {
+                                    <span class="badge bg-label-primary">@item.Project.Title</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Bağımsız Yorum</span>
+                                }
+                            </td>
+
+                            <td>
+                                @for (int i = 0; i < item.Rating; i++)
+                                {
+                                    <span class="text-warning">★</span>
+                                }
+                            </td>
+
+                            <td title="@item.Comment">
+                                @(item.Comment.Length > 30 ? item.Comment.Substring(0, 30) + "..." : item.Comment)
+                            </td>
+
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="badge bg-success">Yayında</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Onay Bekliyor</span>
+                                }
+                            </td>
+
+                            <td>
+                                <a href="/Admin/Testimonial/ChangeStatus/@item.Id" class="btn btn-info btn-sm" title="Durumu Değiştir (Onayla/Kaldır)">
+                                    <i class="bx bx-refresh"></i>
+                                </a>
+
+                                <a href="/Admin/Testimonial/Delete/@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bu yorumu kalıcı olarak silmek istediğinize emin misiniz?');">
+                                    <i class="bx bx-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

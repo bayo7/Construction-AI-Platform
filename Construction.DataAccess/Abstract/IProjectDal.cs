@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Abstract
 {
-    public interface IProjectDal : IGenericRepository<Project>
+    public interface IProjectDal : IGenericDal<Project>
     {
         Task<List<Project>> GetProjectsWithCategory();
     }

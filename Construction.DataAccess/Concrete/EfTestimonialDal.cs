@@ -10,17 +10,18 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Concrete
 {
-    public class EFProjectDal : GenericDal<Project>, IProjectDal
+    public class EfTestimonialDal : GenericDal<Testimonial>, ITestimonialDal
     {
         private readonly ConstructionDbContext _context;
-        public EFProjectDal(ConstructionDbContext context) : base(context)
+
+        public EfTestimonialDal(ConstructionDbContext context) : base(context)
         {
             _context = context;
         }
 
-        public async Task<List<Project>> GetProjectsWithCategory()
+        public async Task<List<Testimonial>> GetTestimonialsWithProjectAsync()
         {
-            return await _context.Projects.Include(p => p.Category).ToListAsync();
+            return await _context.Testimonials.Include(t => t.Project).ToListAsync();
         }
     }
 }

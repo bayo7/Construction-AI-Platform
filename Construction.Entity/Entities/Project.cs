@@ -25,5 +25,7 @@ namespace Construction.Entity.Entities
         public string? DetailsEmbedding { get; set; }
 
         public int CompleetionRate { get; set; }
+
+        public List<Testimonial>? Testimonials { get; set; }
     }
 }

@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Concrete
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericDal<T> : IGenericDal<T> where T : class
     {
         private readonly ConstructionDbContext _context;
 
-        public GenericRepository(ConstructionDbContext context)
+        public GenericDal(ConstructionDbContext context)
         {
             _context = context;
         }

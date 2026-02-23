@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Abstract
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericDal<T> where T : class
     {
         Task InsertAsync(T entity);
         Task UpdateAsync(T entity);

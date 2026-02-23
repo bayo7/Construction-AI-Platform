@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Concrete
 {
-    public class EfCategoryDal : GenericRepository<Category>, ICategoryDal
+    public class EfCategoryDal : GenericDal<Category>, ICategoryDal
     {
         public EfCategoryDal(ConstructionDbContext context) : base(context)
         {

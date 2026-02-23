@@ -14,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ConstructionDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>()
+builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+{
+    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+})
     .AddEntityFrameworkStores<ConstructionDbContext>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
@@ -28,6 +31,9 @@ builder.Services.AddScoped<ICategoryDal, EfCategoryDal>();
 
 builder.Services.AddScoped<IProjectService, ProjectManager>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
+
+builder.Services.AddScoped<ITestimonialDal, EfTestimonialDal>();
+builder.Services.AddScoped<ITestimonialService, TestimonialManager>();
 
 var app = builder.Build();
 
