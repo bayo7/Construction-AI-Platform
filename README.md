@@ -9,8 +9,8 @@ Proje geliştirme sürecinde aşağıdaki teknolojiler ve kütüphaneler kullan�
 * **Backend:** ASP.NET Core 8.0 / 9.0
 * **Veritabanı:** MS SQL Server
 * **ORM:** Entity Framework Core (Code First Yaklaşımı)
-* **Authentication:** ASP.NET Core Identity
-* **Mimari Desenler:** N-Tier Architecture, Generic Repository Pattern, Dependency Injection (DI)
+* **Authentication & Authorization:** ASP.NET Core Identity
+* **Mimari Desenler:** N-Tier Architecture, Generic Repository Pattern, Dependency Injection (DI), Data Transfer Objects (DTO/ViewModel)
 * **Frontend (Admin):** Bootstrap 5, Sneat Admin Template
 * **Frontend (UI):** UpConstruction Template (Entegrasyon aşamasında)
 
@@ -18,36 +18,40 @@ Proje geliştirme sürecinde aşağıdaki teknolojiler ve kütüphaneler kullan�
 
 Proje, S.O.L.I.D. prensiplerine uygun olarak 4 ana katmana ayrılmıştır:
 
-1.  **Entity Layer:** Veritabanı tabloları ve Identity sınıfları (AppUser).
-2.  **DataAccess Layer:** Veri erişim kodları, Generic Repository ve Context yapılandırması.
+1.  **Entity Layer:** Veritabanı tabloları ve özelleştirilmiş Identity sınıfları (`AppUser`, `AppRole`).
+2.  **DataAccess Layer:** Veri erişim kodları, Generic Repository, Context yapılandırması (`IdentityDbContext`) ve Migration'lar.
 3.  **Business Layer:** İş kuralları, Validasyonlar ve AI servis entegrasyonları.
-4.  **Web (UI) Layer:** MVC yapısı, Controller'lar, View'lar ve Admin Paneli (Areas).
+4.  **Web (UI) Layer:** MVC yapısı, Controller'lar, View'lar, ViewModel'ler ve Admin Paneli (Areas).
 
-## ✅ Tamamlanan Özellikler (v1.0 - Pre-Alpha)
+## ✅ Tamamlanan Özellikler (v1.1 - Pre-Alpha)
 
-Şu ana kadar projenin altyapısı ve temel yönetim paneli tamamlanmıştır:
+Şu ana kadar projenin altyapısı, temel yönetim paneli ve kimlik doğrulama sistemleri tamamlanmıştır:
 
 * [x] **Kurumsal Mimari:** Entity, DataAccess ve Business katmanları arasındaki soyutlama (Interface) ve somutlama (Concrete) yapıları kuruldu.
-* [x] **Veritabanı Tasarımı:** Projeler, Kategoriler ve Kullanıcılar için Code-First tabloları oluşturuldu.
-* [x] **Identity Entegrasyonu:** Kullanıcı kayıt, giriş ve rol yönetimi için altyapı hazırlandı.
-* [x] **Admin Paneli:** "Sneat" teması projeye entegre edildi, "Areas" yapısı ile UI'dan izole edildi.
-* [x] **Kategori Yönetimi:** Kategorilerin listelenmesi, eklenmesi ve düzenlenmesi için Backend kodları yazıldı.
+* [x] **Veritabanı Tasarımı:** Projeler, Kategoriler ve Müşteri Yorumları (Testimonials) için ilişkisel Code-First tabloları oluşturuldu.
+* [x] **Admin Paneli Altyapısı:** "Sneat" teması projeye entegre edildi, "Areas" yapısı ile UI'dan izole edildi.
+* [x] **Kategori & Referans Yönetimi:** Kategori ve Müşteri Yorumlarının (Testimonials) listelenmesi, eklenmesi ve silinmesi için Backend/UI kodları yazıldı (Eager Loading / Include işlemleri entegre edildi).
+* [x] **Özelleştirilmiş Identity Entegrasyonu:** ASP.NET Core Identity altyapısı kurularak `AppUser` ve `AppRole` sınıfları sisteme entegre edildi.
+* [x] **Kullanıcı Yönetimi (User Management):** Admin panelinden sisteme yeni kullanıcı ekleme, listeleme ve silme (ViewModel ve UserManager kullanılarak) işlemleri tamamlandı.
+* [x] **Rol Yönetimi ve Atama (Role Management & Assign):** Dinamik rol oluşturma/silme ve çoklu Checkbox (List Model Binding) yapısı ile kullanıcılara rol atama ekranları kodlandı.
+* [x] **Güvenlik ve Oturum (Authorization):** Controller seviyesinde `[Authorize]` attribute'u ile rol bazlı erişim kısıtlamaları getirildi. Cookie (Çerez) yapılandırması ile yetkisiz erişimler engellendi.
 
 ## 🚀 Gelecek Planları (Roadmap)
 
 Projenin bir sonraki fazında aşağıdaki özellikler eklenecektir:
 
+* [ ] **Login (Giriş Yap) Modülü:** Güvenlik duvarından geçen yetkili kullanıcılar için kullanıcı adı/şifre ile sisteme giriş ekranının tasarlanması ve kodlanması.
 * [ ] **AI Entegrasyonu:** Proje detayları girildiğinde OpenAI API kullanılarak otomatik açıklama metni ve SEO uyumlu içerik oluşturulması.
-* [ ] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) giydirilmesi.
-* [ ] **Dashboard Widget'ları:** Admin panelinde aktif proje sayısı, son eklenenler gibi istatistiklerin grafiklerle sunulması.
+* [ ] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) Backend ile bağlanması ve dinamikleştirilmesi.
+* [ ] **Dashboard Widget'ları:** Admin panelinde aktif proje sayısı, son eklenenler, sistemdeki kullanıcı sayısı gibi istatistiklerin grafiklerle sunulması.
 * [ ] **Medya Yönetimi:** Projeler için çoklu fotoğraf yükleme altyapısı.
-* [ ] **Role Based Authorization:** Admin ve Editör yetkilerinin ayrıştırılması.
+* [ ] **Gelişmiş Yetkilendirme:** Sadece sayfa bazlı değil, buton/menü bazlı (View seviyesinde) Editör/Admin yetki ayrımlarının yapılması.
 
 ## ⚙️ Kurulum (Local Development)
 
 1.  Repoyu klonlayın.
 2.  `appsettings.json` dosyasındaki Connection String'i kendi SQL Server bilginize göre düzenleyin.
-3.  Package Manager Console üzerinden `Update-Database` komutunu çalıştırarak veritabanını oluşturun.
+3.  Package Manager Console üzerinden `Update-Database` komutunu çalıştırarak veritabanını (Identity tabloları dahil) oluşturun.
 4.  Projeyi `Construction.Web` katmanından başlatın.
 
 ---
