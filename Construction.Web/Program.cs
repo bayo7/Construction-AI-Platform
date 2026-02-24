@@ -14,11 +14,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ConstructionDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
 {
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 })
     .AddEntityFrameworkStores<ConstructionDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Login/Index";
+    options.AccessDeniedPath = "/ErrorPage/AccessDenied";
+
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(15);
+    options.SlidingExpiration = true;
+});
+
 
 builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
 

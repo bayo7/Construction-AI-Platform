@@ -1,6 +1,7 @@
 ﻿using Construction.Business.Abstract;
 using Construction.Entity.Entities;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 namespace Construction.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class ProjectController : Controller
     {
         private readonly IProjectService _projectService;

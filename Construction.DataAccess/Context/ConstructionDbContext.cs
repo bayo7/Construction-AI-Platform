@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Construction.DataAccess.Context
 {
-    public class ConstructionDbContext : IdentityDbContext<AppUser>
+    public class ConstructionDbContext : IdentityDbContext<AppUser, AppRole, string>
     {
         public ConstructionDbContext(DbContextOptions<ConstructionDbContext> options) : base(options)
         {

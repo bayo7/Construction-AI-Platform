@@ -1,11 +1,13 @@
 ﻿using Construction.Business.Abstract;
 using Construction.Entity.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Construction.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class TestimonialController : Controller
     {
         private readonly ITestimonialService _testimonialService;

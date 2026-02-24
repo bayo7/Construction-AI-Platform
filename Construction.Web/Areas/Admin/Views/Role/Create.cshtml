@@ -1,0 +1,34 @@
+﻿@model Construction.Web.Models.RoleCreateViewModel
+
+@{
+    ViewData["Title"] = "Yeni Rol Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xl-6">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Yeni Yetki Rolü Tanımla</h5>
+            </div>
+            <div class="card-body">
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="text-danger mb-3 border p-3 rounded"></div>
+                }
+
+                <form method="post" action="/Admin/Role/Create">
+
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Name">Rol Adı</label>
+                        <input type="text" class="form-control" asp-for="Name" placeholder="Örn: Admin, Member, Moderator" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <a href="/Admin/Role/Index" class="btn btn-secondary">İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
