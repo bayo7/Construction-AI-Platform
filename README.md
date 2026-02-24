@@ -1,6 +1,6 @@
 # Construction & Real Estate AI Platform
 
-Bu proje, modern web teknolojileri ve **N-Tier (Çok Katmanlı)** mimari kullanılarak geliştirilmiş, dinamik bir inşaat ve gayrimenkul yönetim sistemidir. Klasik CMS özelliklerinin yanı sıra, proje girişlerinde **OpenAI (Yapay Zeka)** desteği ile içerik zenginleştirme özelliklerini barındırmayı hedefler.
+Bu proje, modern web teknolojileri ve **N-Tier (Çok Katmanlı)** mimari kullanılarak geliştirilmiş, dinamik bir inşaat ve gayrimenkul yönetim sistemidir. Klasik CMS özelliklerinin yanı sıra, **Yapay Zeka (AI)** destekli akıllı tavsiye motoru ile kullanıcıların arama niyetlerini anlamsal olarak analiz edip (örn: "doğa ile iç içe" ev arayan birine manzaralı projeleri eşleştirmek) en doğru gayrimenkul önerilerini sunmayı hedefler.
 
 ## 🛠 Teknoloji Yığını (Tech Stack)
 
@@ -41,7 +41,7 @@ Proje, S.O.L.I.D. prensiplerine uygun olarak 4 ana katmana ayrılmıştır:
 Projenin bir sonraki fazında aşağıdaki özellikler eklenecektir:
 
 * [ ] **Login (Giriş Yap) Modülü:** Güvenlik duvarından geçen yetkili kullanıcılar için kullanıcı adı/şifre ile sisteme giriş ekranının tasarlanması ve kodlanması.
-* [ ] **AI Entegrasyonu:** Proje detayları girildiğinde OpenAI API kullanılarak otomatik açıklama metni ve SEO uyumlu içerik oluşturulması.
+* [ ] **AI Destekli Akıllı Öneri Sistemi:** Kullanıcıların incelediği ilanları ve arama terimlerini doğal dil işleme (NLP) ile analiz ederek, kullanıcının gerçek niyetini anlayan (semantic search) ve ona en uygun, benzer veya alternatif projeleri/ilanları sunan yapay zeka tavsiye motoru entegrasyonu.
 * [ ] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) Backend ile bağlanması ve dinamikleştirilmesi.
 * [ ] **Dashboard Widget'ları:** Admin panelinde aktif proje sayısı, son eklenenler, sistemdeki kullanıcı sayısı gibi istatistiklerin grafiklerle sunulması.
 * [ ] **Medya Yönetimi:** Projeler için çoklu fotoğraf yükleme altyapısı.
