@@ -8,6 +8,7 @@ using Construction.Entity.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,12 +23,17 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = "/Login/Index";
-    options.AccessDeniedPath = "/ErrorPage/AccessDenied";
+    options.LoginPath = "/Admin/Auth/Login";
+    options.LogoutPath = "/Admin/Auth/Logout";
+    options.AccessDeniedPath = "/Admin/Auth/AccessDenied";
+
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);   // Oturum süresi
+    options.SlidingExpiration = true;                     // Her istekte süreyi uzat
 
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromDays(15);
-    options.SlidingExpiration = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.Cookie.Name = "ConstructionAdmin.Auth";
 });
 
 
@@ -60,6 +66,12 @@ app.UseStatusCodePagesWithReExecute("/ErrorPage/Error404");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "Admin", "sneat-bootstrap-html-admin-template-free", "assets")),
+    RequestPath = "/admin-assets"
+});
 app.UseRouting();
 
 app.UseAuthentication();

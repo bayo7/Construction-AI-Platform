@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewData["Title"] = "Erişim Reddedildi";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-xxl container-p-y">
+    <div class="misc-wrapper text-center py-5">
+
+        <div class="mb-4">
+            <i class="bi bi-shield-x" style="font-size: 5rem; color: #ea5455;"></i>
+        </div>
+
+        <h2 class="mb-2 mx-2">Erişim Reddedildi! 🔐</h2>
+        <p class="mb-4 mx-2 text-muted">
+            Bu sayfaya erişmek için gerekli yetkiye sahip değilsiniz.<br />
+            Farklı bir hesapla giriş yapmayı deneyin veya yöneticinize başvurun.
+        </p>
+
+        <a asp-action="Index" asp-controller="Dashboard" asp-area="Admin" class="btn btn-primary me-2">
+            <i class="bi bi-house me-1"></i> Dashboard'a Dön
+        </a>
+
+        <form asp-action="Logout" asp-controller="Auth" asp-area="Admin" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right me-1"></i> Çıkış Yap
+            </button>
+        </form>
+
+    </div>
+</div>
+
+
