@@ -35,12 +35,12 @@ Proje, S.O.L.I.D. prensiplerine uygun olarak 4 ana katmana ayrılmıştır:
 * [x] **Kullanıcı Yönetimi (User Management):** Admin panelinden sisteme yeni kullanıcı ekleme, listeleme ve silme (ViewModel ve UserManager kullanılarak) işlemleri tamamlandı.
 * [x] **Rol Yönetimi ve Atama (Role Management & Assign):** Dinamik rol oluşturma/silme ve çoklu Checkbox (List Model Binding) yapısı ile kullanıcılara rol atama ekranları kodlandı.
 * [x] **Güvenlik ve Oturum (Authorization):** Controller seviyesinde `[Authorize]` attribute'u ile rol bazlı erişim kısıtlamaları getirildi. Cookie (Çerez) yapılandırması ile yetkisiz erişimler engellendi.
+* [x] **Login (Giriş Yap) Modülü:** Güvenlik duvarından geçen yetkili kullanıcılar için kullanıcı adı/şifre ile sisteme giriş ekranının tasarlandı ve kodlandı.
 
 ## 🚀 Gelecek Planları (Roadmap)
 
 Projenin bir sonraki fazında aşağıdaki özellikler eklenecektir:
 
-* [ ] **Login (Giriş Yap) Modülü:** Güvenlik duvarından geçen yetkili kullanıcılar için kullanıcı adı/şifre ile sisteme giriş ekranının tasarlanması ve kodlanması.
 * [ ] **AI Destekli Akıllı Öneri Sistemi:** Kullanıcıların incelediği ilanları ve arama terimlerini doğal dil işleme (NLP) ile analiz ederek, kullanıcının gerçek niyetini anlayan (semantic search) ve ona en uygun, benzer veya alternatif projeleri/ilanları sunan yapay zeka tavsiye motoru entegrasyonu.
 * [ ] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) Backend ile bağlanması ve dinamikleştirilmesi.
 * [ ] **Dashboard Widget'ları:** Admin panelinde aktif proje sayısı, son eklenenler, sistemdeki kullanıcı sayısı gibi istatistiklerin grafiklerle sunulması.
