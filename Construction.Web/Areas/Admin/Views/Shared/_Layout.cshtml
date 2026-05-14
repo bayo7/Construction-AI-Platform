@@ -80,6 +80,12 @@
                         </a>
                     </li>
                     <li class="menu-item">
+                        <a href="/Admin/AI/Index" class="menu-link">
+                            <i class="menu-icon tf-icons bx bx-brain"></i>
+                            <div>AI Öneri Motoru</div>
+                        </a>
+                    </li>
+                    <li class="menu-item">
                         <a href="/Admin/Testimonial/Index" class="menu-link">
                             <i class="menu-icon tf-icons bx bx-comment-detail"></i>
                             <div>Müşteri Yorumları</div>
@@ -233,6 +239,8 @@
 
     <!-- Page JS -->
     <script src="/Admin/sneat-bootstrap-html-admin-template-free/assets/js/dashboards-analytics.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 
 </body>
 </html>

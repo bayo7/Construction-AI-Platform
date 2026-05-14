@@ -21,6 +21,9 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 })
     .AddEntityFrameworkStores<ConstructionDbContext>();
 
+builder.Services.AddScoped<IAIRecommendationService, AIRecommendationManager>();
+
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Admin/Auth/Login";
