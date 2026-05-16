@@ -37,12 +37,12 @@ Proje, S.O.L.I.D. prensiplerine uygun olarak 4 ana katmana ayrılmıştır:
 * [x] **Güvenlik ve Oturum (Authorization):** Controller seviyesinde `[Authorize]` attribute'u ile rol bazlı erişim kısıtlamaları getirildi. Cookie (Çerez) yapılandırması ile yetkisiz erişimler engellendi.
 * [x] **Login (Giriş Yap) Modülü:** Güvenlik duvarından geçen yetkili kullanıcılar için kullanıcı adı/şifre ile sisteme giriş ekranının tasarlandı ve kodlandı.
 * [x] **AI Destekli Akıllı Öneri Sistemi:** Kullanıcıların incelediği ilanları ve arama terimlerini doğal dil işleme (NLP) ile analiz ederek, kullanıcının gerçek niyetini anlayan (semantic search) ve ona en uygun, benzer veya alternatif projeleri/ilanları sunan yapay zeka tavsiye motoru entegrasyonu yapıldı.
-
+* [x] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) Backend ile bağlanması ve dinamikleştirilmesi.
 ## 🚀 Gelecek Planları (Roadmap)
 
 Projenin bir sonraki fazında aşağıdaki özellikler eklenecektir:
 
-* [ ] **Frontend (Müşteri Yüzü):** Müşterilerin projeleri inceleyebileceği arayüzün (UpConstruction) Backend ile bağlanması ve dinamikleştirilmesi.
+
 * [ ] **Dashboard Widget'ları:** Admin panelinde aktif proje sayısı, son eklenenler, sistemdeki kullanıcı sayısı gibi istatistiklerin grafiklerle sunulması.
 * [ ] **Medya Yönetimi:** Projeler için çoklu fotoğraf yükleme altyapısı.
 * [ ] **Gelişmiş Yetkilendirme:** Sadece sayfa bazlı değil, buton/menü bazlı (View seviyesinde) Editör/Admin yetki ayrımlarının yapılması.

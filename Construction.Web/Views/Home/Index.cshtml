@@ -1,8 +1,407 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Construction.Web.Models.HomeViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- ════ HERO ════ -->
+<section style="background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 60%, #1a3c5e 100%); min-height: 92vh; display:flex; align-items:center; position:relative; overflow:hidden;">
+
+    <!-- Dekoratif arka plan -->
+    <div style="position:absolute;inset:0;opacity:0.06;background-image:url('data:image/svg+xml,%3Csvg width=60 height=60 viewBox=0 0 60 60 xmlns=http://www.w3.org/2000/svg%3E%3Cg fill=none fill-rule=evenodd%3E%3Cg fill=%23fff fill-opacity=1%3E%3Cpath d=M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+
+    <div class="container py-5" style="position:relative;z-index:1;">
+        <div class="row align-items-center g-5">
+
+            <!-- Sol: Başlık + Arama -->
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="mb-3">
+                    <span class="badge px-3 py-2" style="background:rgba(240,165,0,0.2);color:#f0a500;font-size:0.75rem;letter-spacing:2px;">
+                        🤖 AI DESTEKLI ARAMA
+                    </span>
+                </div>
+                <h1 style="font-size:clamp(2rem,4vw,3.2rem);color:#fff;line-height:1.2;margin-bottom:1.2rem;">
+                    Hayalinizdeki<br />
+                    <span style="color:#f0a500;">Gayrimenkulü</span> Bulun
+                </h1>
+                <p style="color:rgba(255,255,255,0.75);font-size:1.05rem;margin-bottom:2rem;">
+                    Yapay zeka destekli semantik arama motorumuz, arama niyetinizi anlayarak en doğru projeleri sizinle buluşturur. "Doğayla iç içe" yazın, manzaralı projeleri görsün.
+                </p>
+
+                <!-- AI Arama Kutusu -->
+                <div style="background:rgba(255,255,255,0.12);backdrop-filter:blur(12px);border-radius:16px;padding:1.5rem;border:1px solid rgba(255,255,255,0.2);">
+                    <label style="color:rgba(255,255,255,0.8);font-size:0.85rem;font-weight:600;margin-bottom:0.5rem;display:block;">
+                        <i class="bi bi-stars me-1" style="color:#f0a500;"></i>AI ile Doğal Dilde Arama
+                    </label>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="heroSearch" class="form-control form-control-lg"
+                               placeholder="Örn: deniz manzaralı lüks daire, çocuklu aile için sakin..."
+                               style="border-radius:50px;border:none;font-size:0.95rem;" />
+                        <button class="btn btn-lg" id="heroSearchBtn"
+                                style="background:#f0a500;color:#fff;border-radius:50px;white-space:nowrap;font-weight:600;padding:0 1.5rem;">
+                            <i class="bi bi-search me-1"></i>Ara
+                        </button>
+                    </div>
+                    <!-- Örnek sorgular -->
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <span class="example-tag" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:0.25rem 0.8rem;border-radius:50px;font-size:0.78rem;cursor:pointer;">doğayla iç içe</span>
+                        <span class="example-tag" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:0.25rem 0.8rem;border-radius:50px;font-size:0.78rem;cursor:pointer;">deniz manzaralı</span>
+                        <span class="example-tag" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:0.25rem 0.8rem;border-radius:50px;font-size:0.78rem;cursor:pointer;">yatırımlık merkezi</span>
+                        <span class="example-tag" style="background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.85);padding:0.25rem 0.8rem;border-radius:50px;font-size:0.78rem;cursor:pointer;">uygun fiyatlı</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ: İstatistik Kartları -->
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <div class="row g-3">
+                    @{
+                        var stats = new[]
+                        {
+                                        new { Icon="bi-buildings", Value="150+", Label="Tamamlanan Proje", Color="#f0a500" },
+                                        new { Icon="bi-people",    Value="2K+",  Label="Mutlu Müşteri",   Color="#4cc9f0" },
+                                        new { Icon="bi-award",     Value="15+",  Label="Yıllık Deneyim",  Color="#7209b7" },
+                                        new { Icon="bi-geo-alt",   Value="30+",  Label="Şehir & İlçe",    Color="#f72585" },
+                                        };
+                    }
+                    @foreach (var s in stats)
+                    {
+                        <div class="col-6">
+                            <div style="background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border-radius:16px;padding:1.5rem;border:1px solid rgba(255,255,255,0.15);text-align:center;">
+                                <i class="bi @s.Icon" style="font-size:2rem;color:@s.Color;"></i>
+                                <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1.2;margin-top:0.5rem;">@s.Value</div>
+                                <div style="color:rgba(255,255,255,0.65);font-size:0.82rem;">@s.Label</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Wave -->
+    <div style="position:absolute;bottom:0;left:0;right:0;">
+        <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;">
+            <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#ffffff" />
+        </svg>
+    </div>
+</section>
+
+<!-- AI Arama Sonuçları (dinamik) -->
+<section id="aiResults" class="py-5 d-none" style="background:var(--bg-light);">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 style="color:var(--primary);">
+                <i class="bi bi-stars me-2" style="color:var(--accent);"></i>
+                "<span id="aiQueryLabel"></span>" için AI Önerileri
+            </h4>
+            <button class="btn btn-sm btn-outline-secondary" id="closeAiResults">
+                <i class="bi bi-x me-1"></i>Kapat
+            </button>
+        </div>
+        <div id="aiLoading" class="text-center py-4 d-none">
+            <div class="spinner-border" style="color:var(--primary);"></div>
+            <p class="mt-2 text-muted">AI analiz ediyor...</p>
+        </div>
+        <div class="row g-4" id="aiResultCards"></div>
+    </div>
+</section>
+
+<!-- ════ KATEGORİLER ════ -->
+@if (Model.Categories.Any())
+{
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="section-badge">Kategoriler</span>
+                <h2 class="section-title">Proje Türleri</h2>
+            </div>
+            <div class="row g-3 justify-content-center">
+                @foreach (var cat in Model.Categories)
+                {
+                    <div class="col-6 col-md-4 col-lg-2" data-aos="zoom-in">
+                        <a asp-action="Projects" asp-route-categoryId="@cat.Id"
+                           style="text-decoration:none;">
+                            <div style="background:var(--bg-light);border-radius:16px;padding:1.5rem 1rem;text-align:center;transition:all 0.3s;border:2px solid transparent;"
+                                 onmouseover="this.style.borderColor='var(--accent)';this.style.background='#fff';"
+                                 onmouseout="this.style.borderColor='transparent';this.style.background='var(--bg-light)';">
+                                <i class="bi bi-building fs-2" style="color:var(--primary);"></i>
+                                <div style="font-weight:600;font-size:0.9rem;color:var(--text-dark);margin-top:0.75rem;">@cat.CategoryName</div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ════ ÖNE ÇIKAN PROJELER ════ -->
+@if (Model.FeaturedProjects.Any())
+{
+    <section class="py-5" style="background:var(--bg-light);">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="section-badge">Portföy</span>
+                <h2 class="section-title">Öne Çıkan Projeler</h2>
+                <p class="section-subtitle">En güncel ve prestijli projelerimizi keşfedin.</p>
+            </div>
+            <div class="row g-4">
+                @foreach (var project in Model.FeaturedProjects)
+                {
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="project-card card h-100">
+                            <div class="card-img-wrapper">
+                                @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
+                                {
+                                    <img src="/images/@project.CoverImageUrl" alt="@project.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-building" style="font-size:3rem;color:rgba(255,255,255,0.3);"></i>
+                                    </div>
+                                }
+                                <span class="project-status-badge">@project.ProjectStatus</span>
+                                <div class="card-overlay">
+                                    <span style="color:rgba(255,255,255,0.85);font-size:0.8rem;">
+                                        <i class="bi bi-tag me-1"></i>@project.Category?.CategoryName
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="fw-bold mb-1" style="color:var(--primary);font-family:'Inter',sans-serif;">@project.Title</h6>
+                                <p class="project-location mb-2">
+                                    <i class="bi bi-geo-alt me-1"></i>@project.Location
+                                </p>
+                                <p class="text-muted small mb-3" style="flex:1;">
+                                    @(project.Description?.Length > 90 ? project.Description[..90] + "..." : project.Description)
+                                </p>
+                                <!-- Tamamlanma -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Tamamlanma</small>
+                                        <small class="fw-semibold">%@project.CompleetionRate</small>
+                                    </div>
+                                    <div class="progress-thin">
+                                        <div class="progress-bar" style="width:@project.CompleetionRate%;"></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="project-price">@project.MinPrice.ToString("N0") ₺</span>
+                                    <a asp-action="ProjectDetail" asp-route-id="@project.Id"
+                                       class="btn btn-sm" style="background:var(--primary);color:#fff;border-radius:50px;padding:0.35rem 1rem;font-size:0.82rem;">
+                                        İncele <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center mt-5">
+                <a asp-action="Projects" class="btn-primary-custom btn">
+                    Tüm Projeleri Gör <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ════ NEDEN BİZ ════ -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5" data-aos="fade-right">
+                <span class="section-badge">Fark Yaratan</span>
+                <h2 class="section-title">Neden Construction AI?</h2>
+                <p class="text-muted mb-4">Klasik emlak arama deneyimini AI ile dönüştürüyoruz. Arama niyetinizi anlayarak en doğru eşleşmeyi sunuyoruz.</p>
+                @{
+                    var features = new[]
+                    {
+                                new { Icon="bi-robot",      Title="Semantik AI Arama",    Desc="Doğal dil ile arayın, sistem niyetinizi anlasın." },
+                                new { Icon="bi-shield-check",Title="Güvenilir Portföy",   Desc="Tüm projeler doğrulanmış, şeffaf bilgi sunuyoruz." },
+                                new { Icon="bi-headset",     Title="7/24 Destek",         Desc="Uzman ekibimiz her adımda yanınızda." },
+                                };
+                }
+                @foreach (var f in features)
+                {
+                    <div class="d-flex gap-3 mb-4">
+                        <div style="width:48px;height:48px;background:rgba(26,60,94,0.08);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi @f.Icon fs-5" style="color:var(--primary);"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold mb-1">@f.Title</div>
+                            <p class="text-muted small mb-0">@f.Desc</p>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-7" data-aos="fade-left">
+                <div style="background:linear-gradient(135deg,#1a3c5e,#2d6a9f);border-radius:24px;padding:3rem;color:#fff;position:relative;overflow:hidden;">
+                    <div style="position:absolute;top:-30px;right:-30px;width:150px;height:150px;background:rgba(240,165,0,0.15);border-radius:50%;"></div>
+                    <div style="position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;background:rgba(255,255,255,0.07);border-radius:50%;"></div>
+                    <h4 class="mb-4" style="color:#fff;position:relative;">AI Nasıl Çalışır?</h4>
+                    @{
+                        var steps = new[]
+                        {
+                                        new { N="1", T="Sorgunuzu Yazın",       D="\"Doğayla iç içe huzurlu\" gibi doğal bir cümle yeterli." },
+                                        new { N="2", T="AI Analiz Eder",        D="Gemini AI embeddings ile niyetinizi kavrar." },
+                                        new { N="3", T="En İyi Eşleşme",        D="Cosine similarity ile en uygun projeler sıralanır." },
+                                        new { N="4", T="Kişisel Öneriler",      D="Eşleşme skoru ve açıklamayla sonuçlar sunulur." },
+                                        };
+                    }
+                    @foreach (var step in steps)
+                    {
+                        <div class="d-flex gap-3 mb-3" style="position:relative;">
+                            <div style="width:36px;height:36px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;flex-shrink:0;">@step.N</div>
+                            <div>
+                                <div class="fw-semibold mb-0">@step.T</div>
+                                <small style="color:rgba(255,255,255,0.7);">@step.D</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ════ TESTİMONIALS ════ -->
+@if (Model.Testimonials.Any())
+{
+    <section class="py-5" style="background:var(--bg-light);">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <span class="section-badge">Referanslar</span>
+                <h2 class="section-title">Müşterilerimiz Ne Diyor?</h2>
+            </div>
+            <div class="row g-4">
+                @foreach (var t in Model.Testimonials)
+                {
+                    <div class="col-md-6 col-lg-4" data-aos="fade-up">
+                        <div class="testimonial-card h-100">
+                            <div class="stars mb-2">
+                                @for (int i = 0; i < Math.Min(t.Rating, 5); i++)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                            </div>
+                            <p class="text-muted mb-3 fst-italic">"@t.Comment"</p>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:40px;height:40px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">
+                                    @t.NameSurname[0]
+                                </div>
+                                <div>
+                                    <div class="fw-semibold" style="font-size:0.9rem;">@t.NameSurname</div>
+                                    @if (!string.IsNullOrEmpty(t.Title))
+                                    {
+                                        <small class="text-muted">@t.Title</small>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ════ CTA BANNER ════ -->
+<section class="py-5" style="background:linear-gradient(135deg,#f0a500,#d4920a);">
+    <div class="container text-center" data-aos="zoom-in">
+        <h2 style="color:#fff;margin-bottom:1rem;">Hayalinizdeki Projeyi Bulun</h2>
+        <p style="color:rgba(255,255,255,0.85);max-width:500px;margin:0 auto 2rem;">
+            Uzman ekibimizle ücretsiz danışma alın, size özel proje önerileri alın.
+        </p>
+        <a asp-action="Contact" class="btn btn-lg"
+           style="background:#fff;color:var(--accent-dark);border-radius:50px;font-weight:700;padding:0.85rem 2.5rem;">
+            Ücretsiz Danışma Al <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // ─── AI Kart Oluşturucu ──────────────────────────────────────────────────────
+        function buildAiCard(item) {
+            const img = item.coverImageUrl && item.coverImageUrl !== 'no-image.jpg'
+                ? `/images/${item.coverImageUrl}` : '';
+            const imgHtml = img
+                ? `<img src="${img}" alt="${item.title}" style="width:100%;height:180px;object-fit:cover;" />`
+                : `<div style="width:100%;height:180px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;"><i class="bi bi-building" style="font-size:2.5rem;color:rgba(255,255,255,0.4);"></i></div>`;
+
+            const scoreColor = item.score >= 85 ? '#2ecc71' : item.score >= 70 ? '#3498db' : '#f0a500';
+
+            return `
+            <div class="col-md-6 col-lg-4">
+              <div class="project-card card h-100">
+                <div style="position:relative;border-radius:16px 16px 0 0;overflow:hidden;">
+                  ${imgHtml}
+                  <span style="position:absolute;top:10px;right:10px;background:${scoreColor};color:#fff;font-size:0.75rem;font-weight:700;padding:0.25rem 0.75rem;border-radius:50px;">
+                    %${item.score} Eşleşme
+                  </span>
+                </div>
+                <div class="card-body d-flex flex-column">
+                  <h6 class="fw-bold" style="color:var(--primary);">${item.title}</h6>
+                  <p class="project-location mb-2"><i class="bi bi-geo-alt me-1"></i>${item.location}</p>
+                  <p class="text-muted small mb-3" style="flex:1;"><i class="bi bi-info-circle me-1" style="color:${scoreColor};"></i>${item.matchReason}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="project-price">${Number(item.minPrice).toLocaleString('tr-TR')} ₺</span>
+                    <a href="/Home/ProjectDetail/${item.id}" class="btn btn-sm" style="background:var(--primary);color:#fff;border-radius:50px;font-size:0.82rem;padding:0.35rem 1rem;">
+                      İncele <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+        }
+
+        // ─── AI Arama ────────────────────────────────────────────────────────────────
+        async function doHeroSearch() {
+            const query = document.getElementById('heroSearch').value.trim();
+            if (!query) { document.getElementById('heroSearch').focus(); return; }
+
+            document.getElementById('aiQueryLabel').textContent = query;
+            document.getElementById('aiResults').classList.remove('d-none');
+            document.getElementById('aiLoading').classList.remove('d-none');
+            document.getElementById('aiResultCards').innerHTML = '';
+            document.getElementById('aiResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            try {
+                const res  = await fetch('/Home/AISearch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await res.json();
+                document.getElementById('aiLoading').classList.add('d-none');
+
+                if (data.success && data.results?.length) {
+                    document.getElementById('aiResultCards').innerHTML = data.results.map(buildAiCard).join('');
+                } else {
+                    document.getElementById('aiResultCards').innerHTML =
+                        `<div class="col-12 text-center py-4"><i class="bi bi-search fs-1 text-muted"></i><p class="mt-3 text-muted">Eşleşen proje bulunamadı. Farklı bir ifade deneyin.</p></div>`;
+                }
+            } catch (e) {
+                document.getElementById('aiLoading').classList.add('d-none');
+                document.getElementById('aiResultCards').innerHTML =
+                    `<div class="col-12"><div class="alert alert-danger">AI servisi şu an kullanılamıyor.</div></div>`;
+            }
+        }
+
+        document.getElementById('heroSearchBtn').addEventListener('click', doHeroSearch);
+        document.getElementById('heroSearch').addEventListener('keydown', e => { if (e.key === 'Enter') doHeroSearch(); });
+        document.getElementById('closeAiResults').addEventListener('click', () => {
+            document.getElementById('aiResults').classList.add('d-none');
+        });
+        document.querySelectorAll('.example-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.getElementById('heroSearch').value = tag.textContent;
+                doHeroSearch();
+            });
+        });
+    </script>
+}

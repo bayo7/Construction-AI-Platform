@@ -1,0 +1,279 @@
+﻿@model Construction.Web.Models.ProjectDetailViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = Model.Project.Title;
+    var project = Model.Project;
+}
+
+<!-- Breadcrumb -->
+<div style="background:var(--bg-light);padding:0.75rem 0;border-bottom:1px solid var(--border);">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item"><a asp-action="Index" style="color:var(--primary);">Ana Sayfa</a></li>
+                <li class="breadcrumb-item"><a asp-action="Projects" style="color:var(--primary);">Projeler</a></li>
+                <li class="breadcrumb-item active text-muted">@project.Title</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+
+            <!-- ── Sol: Görsel + Detay ── -->
+            <div class="col-lg-8">
+
+                <!-- Kapak Görseli -->
+                <div style="border-radius:20px;overflow:hidden;margin-bottom:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+                    @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
+                    {
+                        <img src="/images/@project.CoverImageUrl" alt="@project.Title"
+                             style="width:100%;height:420px;object-fit:cover;" />
+                    }
+                    else
+                    {
+                        <div style="width:100%;height:420px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-building" style="font-size:5rem;color:rgba(255,255,255,0.25);"></i>
+                        </div>
+                    }
+                </div>
+
+                <!-- Başlık + Rozetler -->
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                    <div>
+                        <h1 style="font-size:1.9rem;color:var(--primary);margin-bottom:0.4rem;">@project.Title</h1>
+                        <p class="project-location fs-6">
+                            <i class="bi bi-geo-alt me-1"></i>@project.Location
+                        </p>
+                    </div>
+                    <div class="d-flex flex-column gap-2 align-items-end">
+                        <span class="badge px-3 py-2" style="background:var(--accent);font-size:0.85rem;">@project.ProjectStatus</span>
+                        @if (project.Category != null)
+                        {
+                            <span class="badge bg-light text-dark border">@project.Category.CategoryName</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Tamamlanma Oranı -->
+                <div style="background:var(--bg-light);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-semibold small">Tamamlanma Oranı</span>
+                        <span class="fw-bold" style="color:var(--accent);">%@project.CompleetionRate</span>
+                    </div>
+                    <div style="background:var(--border);border-radius:10px;height:10px;">
+                        <div style="height:10px;width:@project.CompleetionRate%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:10px;"></div>
+                    </div>
+                </div>
+
+                <!-- Açıklama -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3" style="color:var(--primary);font-family:'Inter',sans-serif;">Proje Hakkında</h5>
+                    <p class="text-muted" style="line-height:1.85;">@project.Description</p>
+                </div>
+
+                <!-- Özellikler Özet -->
+                <div class="row g-3 mb-5">
+                    @{
+                        var infos = new[]
+                        {
+                                        new { Icon="bi-calendar3",     Label="Eklenme Tarihi", Value=project.CreatedDate.ToString("dd MMMM yyyy") },
+                                        new { Icon="bi-tag",           Label="Kategori",       Value=project.Category?.CategoryName ?? "-" },
+                                        new { Icon="bi-geo-alt",       Label="Konum",          Value=project.Location },
+                                        new { Icon="bi-bar-chart",     Label="Tamamlanma",     Value=$"%{project.CompleetionRate}" },
+                                        };
+                    }
+                    @foreach (var info in infos)
+                    {
+                        <div class="col-6 col-md-3">
+                            <div style="background:var(--bg-light);border-radius:12px;padding:1rem;text-align:center;">
+                                <i class="bi @info.Icon fs-4" style="color:var(--primary);"></i>
+                                <div class="small text-muted mt-1">@info.Label</div>
+                                <div class="fw-semibold small">@info.Value</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Yorumlar -->
+                @if (Model.Testimonials.Any())
+                {
+                    <div>
+                        <h5 class="fw-bold mb-4" style="color:var(--primary);font-family:'Inter',sans-serif;">
+                            <i class="bi bi-chat-quote me-2"></i>Müşteri Yorumları
+                            <span class="badge ms-2" style="background:var(--accent);font-size:0.8rem;">@Model.Testimonials.Count</span>
+                        </h5>
+                        <div class="row g-3">
+                            @foreach (var t in Model.Testimonials)
+                            {
+                                <div class="col-12">
+                                    <div class="testimonial-card">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div style="width:42px;height:42px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">
+                                                    @t.NameSurname[0]
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold" style="font-size:0.9rem;">@t.NameSurname</div>
+                                                    @if (!string.IsNullOrEmpty(t.Title))
+                                                    {
+                                                        <small class="text-muted">@t.Title</small>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div class="stars">
+                                                @for (int i = 0; i < Math.Min(t.Rating, 5); i++)
+                                                {
+                                                    <i class="bi bi-star-fill"></i>
+                                                }
+                                            </div>
+                                        </div>
+                                        <p class="text-muted mb-0 fst-italic">"@t.Comment"</p>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- ── Sağ: Fiyat + İletişim ── -->
+            <div class="col-lg-4">
+                <div style="position:sticky;top:90px;">
+
+                    <!-- Fiyat Kartı -->
+                    <div style="background:#fff;border-radius:20px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.1);border-top:4px solid var(--accent);margin-bottom:1.5rem;">
+                        <div class="text-center mb-3">
+                            <div class="text-muted small">Başlangıç Fiyatı</div>
+                            <div style="font-size:2rem;font-weight:800;color:var(--primary);">
+                                @project.MinPrice.ToString("N0") ₺
+                            </div>
+                        </div>
+                        <hr />
+                        <!-- Mini İletişim Formu -->
+                        <h6 class="fw-bold mb-3" style="font-family:'Inter',sans-serif;">Bilgi Alın</h6>
+                        <div id="sideContactForm">
+                            <input type="text" id="scName" class="form-control form-control-sm mb-2" placeholder="Adınız Soyadınız" />
+                            <input type="tel" id="scPhone" class="form-control form-control-sm mb-2" placeholder="Telefon Numaranız" />
+                            <input type="email" id="scEmail" class="form-control form-control-sm mb-3" placeholder="E-posta Adresiniz" />
+                            <button class="btn-accent btn w-100" id="scSubmit">
+                                <i class="bi bi-send me-1"></i>Bilgi Talep Et
+                            </button>
+                            <div id="scSuccess" class="alert alert-success mt-3 d-none small">
+                                <i class="bi bi-check-circle me-1"></i>Talebiniz alındı, en kısa sürede dönüş yapacağız.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hızlı İletişim -->
+                    <div style="background:var(--bg-light);border-radius:16px;padding:1.25rem;">
+                        <h6 class="fw-bold mb-3" style="font-family:'Inter',sans-serif;color:var(--primary);">Hızlı İletişim</h6>
+                        <a href="tel:+902120000000" class="d-flex align-items-center gap-2 text-decoration-none mb-2 p-2 rounded hover-bg"
+                           style="color:var(--text-dark);">
+                            <div style="width:36px;height:36px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-telephone text-white"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">Telefon</div>
+                                <div class="fw-semibold small">+90 (212) 000 00 00</div>
+                            </div>
+                        </a>
+                        <a href="https://wa.me/905000000000" target="_blank"
+                           class="d-flex align-items-center gap-2 text-decoration-none p-2 rounded"
+                           style="color:var(--text-dark);">
+                            <div style="width:36px;height:36px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-whatsapp text-white"></i>
+                            </div>
+                            <div>
+                                <div class="small text-muted">WhatsApp</div>
+                                <div class="fw-semibold small">Mesaj Gönder</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benzer Projeler -->
+        @if (Model.SimilarProjects.Any())
+        {
+            <hr class="my-5" />
+            <div>
+                <h4 class="mb-4" style="color:var(--primary);">
+                    <i class="bi bi-stars me-2" style="color:var(--accent);"></i>AI ile Benzer Projeler
+                </h4>
+                <div class="row g-4">
+                    @foreach (var sp in Model.SimilarProjects)
+                    {
+                        <div class="col-md-4">
+                            <div class="project-card card h-100">
+                                <div class="card-img-wrapper">
+                                    @if (!string.IsNullOrEmpty(sp.CoverImageUrl) && sp.CoverImageUrl != "no-image.jpg")
+                                    {
+                                        <img src="/images/@sp.CoverImageUrl" alt="@sp.Title" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                                            <i class="bi bi-building" style="font-size:2rem;color:rgba(255,255,255,0.3);"></i>
+                                        </div>
+                                    }
+                                    <span class="project-status-badge">@sp.ProjectStatus</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="fw-bold mb-1" style="color:var(--primary);font-family:'Inter',sans-serif;">@sp.Title</h6>
+                                    <p class="project-location mb-2"><i class="bi bi-geo-alt me-1"></i>@sp.Location</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="project-price">@sp.MinPrice.ToString("N0") ₺</span>
+                                        <a asp-action="ProjectDetail" asp-route-id="@sp.Id"
+                                           class="btn btn-sm" style="background:var(--primary);color:#fff;border-radius:50px;font-size:0.82rem;">
+                                            İncele
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.getElementById('scSubmit').addEventListener('click', async () => {
+            const name  = document.getElementById('scName').value.trim();
+            const phone = document.getElementById('scPhone').value.trim();
+            const email = document.getElementById('scEmail').value.trim();
+            if (!name || !phone) { alert('Lütfen adınızı ve telefonunuzu girin.'); return; }
+
+            const btn = document.getElementById('scSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Gönderiliyor...';
+
+            try {
+                await fetch('/Home/SendContact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name, phone, email,
+                        subject: 'Proje Bilgi Talebi: @project.Title',
+                        message: '@project.Title projesi hakkında bilgi almak istiyorum.'
+                    })
+                });
+                document.getElementById('scSuccess').classList.remove('d-none');
+                document.getElementById('scName').value = '';
+                document.getElementById('scPhone').value = '';
+                document.getElementById('scEmail').value = '';
+            } catch(e) {
+                alert('Bir hata oluştu, lütfen tekrar deneyin.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send me-1"></i>Bilgi Talep Et';
+            }
+        });
+    </script>
+}

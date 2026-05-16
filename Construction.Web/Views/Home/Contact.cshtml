@@ -1,0 +1,220 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "İletişim";
+}
+
+<!-- Header -->
+<section style="background:linear-gradient(135deg,#1a3c5e,#2d6a9f);padding:4rem 0 5rem;">
+    <div class="container text-center">
+        <h1 style="color:#fff;margin-bottom:0.5rem;">İletişime Geçin</h1>
+        <p style="color:rgba(255,255,255,0.75);">Uzman ekibimiz sizin için burada</p>
+    </div>
+    <svg viewBox="0 0 1440 50" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="display:block;">
+        <path d="M0,25 C480,50 960,0 1440,25 L1440,50 L0,50 Z" fill="#ffffff" />
+    </svg>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row g-5">
+
+            <!-- ── Sol: İletişim Bilgileri ── -->
+            <div class="col-lg-4" data-aos="fade-right">
+
+                <!-- Info Kartları -->
+                @{
+                    var contactCards = new[]
+                    {
+                                new { Icon="bi-geo-alt-fill",    Title="Adresimiz",      Value="Levent, İstanbul, Türkiye",    Color="var(--primary)" },
+                                new { Icon="bi-telephone-fill",  Title="Telefon",        Value="+90 (212) 000 00 00",          Color="#2ecc71" },
+                                new { Icon="bi-envelope-fill",   Title="E-posta",        Value="info@constructionai.com",      Color="var(--accent)" },
+                                new { Icon="bi-clock-fill",      Title="Çalışma Saati",  Value="Pzt–Cum: 09:00–18:00",         Color="#9b59b6" },
+                                };
+                }
+                <div class="d-flex flex-column gap-3 mb-4">
+                    @foreach (var c in contactCards)
+                    {
+                        <div style="background:#fff;border-radius:14px;padding:1.25rem;box-shadow:0 2px 12px rgba(0,0,0,0.06);display:flex;align-items:center;gap:1rem;">
+                            <div style="width:48px;height:48px;background:@c.Color;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi @c.Icon text-white fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-muted small">@c.Title</div>
+                                <div class="fw-semibold">@c.Value</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Sosyal Medya -->
+                <div style="background:var(--bg-light);border-radius:14px;padding:1.25rem;">
+                    <h6 class="fw-bold mb-3" style="font-family:'Inter',sans-serif;color:var(--primary);">Sosyal Medya</h6>
+                    <div class="d-flex gap-2">
+                        @{
+                            var socials = new[]
+                            {
+                                                new { Icon="bi-facebook",  Href="#", Color="#1877f2" },
+                                                new { Icon="bi-instagram", Href="#", Color="#e4405f" },
+                                                new { Icon="bi-linkedin",  Href="#", Color="#0a66c2" },
+                                                new { Icon="bi-youtube",   Href="#", Color="#ff0000" },
+                                                new { Icon="bi-whatsapp",  Href="#", Color="#25d366" },
+                                                };
+                        }
+                        @foreach (var s in socials)
+                        {
+                            <a href="@s.Href" target="_blank"
+                               style="width:42px;height:42px;background:@s.Color;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;text-decoration:none;transition:transform 0.2s;"
+                               onmouseover="this.style.transform='translateY(-3px)'"
+                               onmouseout="this.style.transform='translateY(0)'">
+                                <i class="bi @s.Icon"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Sağ: İletişim Formu ── -->
+            <div class="col-lg-8" data-aos="fade-left">
+                <div style="background:#fff;border-radius:20px;padding:2.5rem;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+                    <h4 class="mb-1" style="color:var(--primary);">Bize Mesaj Gönderin</h4>
+                    <p class="text-muted small mb-4">En kısa sürede size dönüş yapacağız.</p>
+
+                    <!-- Başarı Mesajı -->
+                    <div id="formSuccess" class="alert alert-success d-none mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Mesajınız başarıyla iletildi! En kısa sürede sizinle iletişime geçeceğiz.
+                    </div>
+
+                    <!-- Hata Mesajı -->
+                    <div id="formError" class="alert alert-danger d-none mb-4">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <span id="formErrorText"></span>
+                    </div>
+
+                    <div id="contactForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Adınız Soyadınız <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
+                                    <input type="text" id="cfName" class="form-control" placeholder="Adınız Soyadınız" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">E-posta <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
+                                    <input type="email" id="cfEmail" class="form-control" placeholder="ornek@mail.com" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Telefon</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-telephone text-muted"></i></span>
+                                    <input type="tel" id="cfPhone" class="form-control" placeholder="+90 5XX XXX XX XX" />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small">Konu <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-chat text-muted"></i></span>
+                                    <select id="cfSubject" class="form-select">
+                                        <option value="">Konu Seçin...</option>
+                                        <option>Proje Hakkında Bilgi</option>
+                                        <option>Satış Danışmanlığı</option>
+                                        <option>Yatırım Danışmanlığı</option>
+                                        <option>Şikayet & Öneri</option>
+                                        <option>Diğer</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold small">Mesajınız <span class="text-danger">*</span></label>
+                                <textarea id="cfMessage" class="form-control" rows="5"
+                                          placeholder="Mesajınızı buraya yazın..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <!-- KVKK -->
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="cfKvkk" />
+                                    <label class="form-check-label small text-muted" for="cfKvkk">
+                                        Kişisel verilerimin işlenmesine ilişkin <a href="#" style="color:var(--primary);">Aydınlatma Metni</a>'ni okudum ve onaylıyorum.
+                                    </label>
+                                </div>
+                                <button class="btn-accent btn px-5" id="cfSubmit">
+                                    <i class="bi bi-send me-2"></i>Mesaj Gönder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Harita (placeholder) -->
+        <div class="mt-5" data-aos="fade-up">
+            <div style="border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3008.1!2d28.9784!3d41.0822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zTGV2ZW50LCDEsHN0YW5idWw!5e0!3m2!1str!2str!4v1"
+                        width="100%" height="380" style="border:0;display:block;"
+                        allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.getElementById('cfSubmit').addEventListener('click', async () => {
+            const name    = document.getElementById('cfName').value.trim();
+            const email   = document.getElementById('cfEmail').value.trim();
+            const phone   = document.getElementById('cfPhone').value.trim();
+            const subject = document.getElementById('cfSubject').value;
+            const message = document.getElementById('cfMessage').value.trim();
+            const kvkk    = document.getElementById('cfKvkk').checked;
+
+            // Validasyon
+            if (!name)    { showError('Adınızı girmeniz zorunludur.'); return; }
+            if (!email)   { showError('E-posta adresinizi girmeniz zorunludur.'); return; }
+            if (!subject) { showError('Lütfen bir konu seçin.'); return; }
+            if (!message) { showError('Mesajınızı girmeniz zorunludur.'); return; }
+            if (!kvkk)    { showError('Devam etmek için KVKK metnini onaylamanız gerekmektedir.'); return; }
+
+            const btn = document.getElementById('cfSubmit');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Gönderiliyor...';
+
+            document.getElementById('formError').classList.add('d-none');
+
+            try {
+                const res  = await fetch('/Home/SendContact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, phone, subject, message })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    document.getElementById('contactForm').classList.add('d-none');
+                    document.getElementById('formSuccess').classList.remove('d-none');
+                } else {
+                    showError(data.message ?? 'Bir hata oluştu.');
+                }
+            } catch (e) {
+                showError('Sunucuya bağlanılamadı. Lütfen daha sonra tekrar deneyin.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send me-2"></i>Mesaj Gönder';
+            }
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('formError');
+            document.getElementById('formErrorText').textContent = msg;
+            el.classList.remove('d-none');
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+}
