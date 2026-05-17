@@ -1,118 +1,233 @@
-﻿@model Project
-
+﻿@model Construction.Entity.Entities.Project
+@using Microsoft.AspNetCore.Mvc.Rendering
 @{
     ViewData["Title"] = "Proje Güncelle";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var galleryImages = ViewBag.GalleryImages as List<Construction.Entity.Entities.ProjectImage> ?? new();
+    bool isAdmin = User.IsInRole("Admin");
 }
 
 <div class="row">
     <div class="col-xl">
         <div class="card mb-4">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Proje Düzenleme</h5>
+                <a href="/Admin/Project/Index" class="btn btn-sm btn-outline-secondary">
+                    <i class="bx bx-arrow-back me-1"></i>Listeye Dön
+                </a>
             </div>
             <div class="card-body">
-
                 @if (!ViewData.ModelState.IsValid)
                 {
-                    <div asp-validation-summary="All" class="text-danger mb-3 border p-3"></div>
+                    <div asp-validation-summary="All" class="text-danger mb-3 border p-3 rounded"></div>
                 }
 
                 <form method="post" action="/Admin/Project/UpdateProject" enctype="multipart/form-data">
-
+                    @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CreatedDate" /> <input type="hidden" asp-for="CoverImageUrl" /> <div class="mb-3">
-                        <label class="form-label" asp-for="Title">Proje Başlığı</label>
-                        <input type="text" class="form-control" asp-for="Title" />
-                        <span asp-validation-for="Title" class="text-danger"></span>
+                    <input type="hidden" asp-for="CreatedDate" />
+                    <input type="hidden" asp-for="CoverImageUrl" />
+                    <input type="hidden" asp-for="DetailsEmbedding" />
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Proje Başlığı</label>
+                            <input type="text" class="form-control" asp-for="Title" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Kategori</label>
+                            @Html.DropDownListFor(x => x.CategoryId, (List<SelectListItem>)ViewBag.v, new { @class = "form-control" })
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Kategori</label>
-                        @Html.DropDownListFor(x => x.CategoryId, (List<SelectListItem>)ViewBag.v, new { @class = "form-control" })
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" asp-for="Location">Lokasyon</label>
-                        <input type="text" class="form-control" asp-for="Location" />
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label" asp-for="MinPrice">Fiyat</label>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Lokasyon</label>
+                            <input type="text" class="form-control" asp-for="Location" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Başlangıç Fiyatı (₺)</label>
                             <input type="number" class="form-control" asp-for="MinPrice" />
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Tamamlanma Oranı: <span id="rangeVal">@Model.CompleetionRate</span>%</label>
-                            <input type="range" class="form-range" asp-for="CompleetionRate" min="0" max="100" id="updateRange">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label" asp-for="ProjectStatus">Proje Durumu</label>
-                            <input type="text" class="form-control" asp-for="ProjectStatus" placeholder="Örn: Satışta, Teslim Edildi" />
-                            <span asp-validation-for="ProjectStatus" class="text-danger"></span>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Proje Durumu</label>
+                            <input type="text" class="form-control" asp-for="ProjectStatus" />
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Mevcut Kapak Görseli</label> <br />
-                        <img src="/project-images/@Model.CoverImageUrl" style="height:100px; width:150px; object-fit:cover; border-radius:5px;" />
+                        <label class="form-label fw-semibold">
+                            Tamamlanma Oranı: <span id="rangeVal">@Model.CompleetionRate</span>%
+                        </label>
+                        <input type="range" class="form-range" asp-for="CompleetionRate"
+                               min="0" max="100" id="updateRange" />
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Yeni Görsel Seç (Değiştirmek İstemiyorsan Boş Bırak)</label>
-                        <input type="file" class="form-control" name="imageFile" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label" asp-for="Description">Açıklama</label>
+                        <label class="form-label fw-semibold">Açıklama</label>
                         <textarea class="form-control" asp-for="Description" rows="4"></textarea>
                     </div>
 
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" asp-for="IsActive" id="isActiveSwitch" checked />
+                    <!-- ── KAPAK GÖRSELİ ── -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Kapak Görseli</label>
+                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                            @if (!string.IsNullOrEmpty(Model.CoverImageUrl) && Model.CoverImageUrl != "no-image.jpg")
+                            {
+                                <div class="position-relative">
+                                    <img src="/images/@Model.CoverImageUrl"
+                                         style="height:100px;width:150px;object-fit:cover;border-radius:8px;border:2px solid #e0e0e0;" />
+                                    <span class="badge bg-success position-absolute top-0 start-0 m-1" style="font-size:0.65rem;">Mevcut</span>
+                                </div>
+                            }
+                            <div class="flex-grow-1">
+                                <input type="file" class="form-control" name="imageFile"
+                                       accept="image/jpeg,image/png,image/webp" />
+                                <small class="text-muted">Değiştirmek istemiyorsan boş bırak. (JPG, PNG, WEBP)</small>
+                            </div>
+                        </div>
+                    </div>
 
-                        <label class="form-check-label text-success" for="isActiveSwitch" id="isActiveLabel">
+                    <!-- ── GALERİ YÖNETİMİ ── -->
+                    <div class="card border-0 bg-light mb-4">
+                        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0"><i class="bx bx-images me-1 text-primary"></i>Proje Galerisi</h6>
+                                <small class="text-muted">@galleryImages.Count görsel mevcut</small>
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            @if (galleryImages.Any())
+                            {
+                                <div class="row g-3 mb-3" id="galleryGrid">
+                                    @foreach (var img in galleryImages)
+                                    {
+                                        <div class="col-6 col-md-3 col-lg-2 gallery-item" data-id="@img.Id">
+                                            <div class="position-relative">
+                                                <img src="/images/@img.ImageUrl"
+                                                     style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:2px solid #dee2e6;" />
+                                                <!-- Silme butonu -->
+                                                <button type="button"
+                                                        class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 btn-delete-gallery"
+                                                        data-id="@img.Id"
+                                                        style="width:22px;height:22px;font-size:0.7rem;line-height:1;"
+                                                        title="Görseli Sil">
+                                                    <i class="bx bx-x"></i>
+                                                </button>
+                                                @if (!string.IsNullOrEmpty(img.Caption))
+                                                {
+                                                    <small class="d-block text-muted mt-1 text-truncate">@img.Caption</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted small mb-3">
+                                    <i class="bx bx-info-circle me-1"></i>Henüz galeri görseli eklenmemiş.
+                                </p>
+                            }
+
+                            <!-- Yeni Görseller Yükle -->
+                            <div>
+                                <label class="form-label fw-semibold small">Yeni Galeri Görselleri Ekle</label>
+                                <input type="file" class="form-control" name="galleryFiles"
+                                       multiple accept="image/jpeg,image/png,image/webp"
+                                       id="galleryInput" />
+                                <small class="text-muted">Birden fazla dosya seçebilirsiniz (Ctrl+Tıkla). Maks 10 dosya.</small>
+                                <div id="galleryPreview" class="row g-2 mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aktif/Pasif -->
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" asp-for="IsActive"
+                               id="isActiveSwitch" />
+                        <label class="form-check-label text-success fw-semibold"
+                               for="isActiveSwitch" id="isActiveLabel">
                             Proje Yayında (Aktif)
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-warning">Güncelle</button>
-                    <a href="/Admin/Project/Index" class="btn btn-secondary">İptal</a>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bx bx-save me-1"></i>Güncelle
+                        </button>
+                        <a href="/Admin/Project/Index" class="btn btn-secondary">İptal</a>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    document.getElementById('updateRange').addEventListener('input', function (e) {
-        document.getElementById('rangeVal').innerText = e.target.value;
-    });
-</script>
-<script>
-    // 1. Elementleri seçiyoruz
-    const switchElement = document.getElementById('isActiveSwitch');
-    const labelElement = document.getElementById('isActiveLabel');
+@section Scripts {
+    <script>
+        // ─── Range slider ──────────────────────────────────────────────────────────
+        document.getElementById('updateRange').addEventListener('input', e =>
+            document.getElementById('rangeVal').innerText = e.target.value);
 
-    // 2. Değişiklik fonksiyonu
-    function updateSwitchLabel() {
-        if (switchElement.checked) {
-            // Eğer tikliyse:
-            labelElement.innerText = "Proje Yayında (Aktif)";
-            labelElement.classList.remove('text-danger'); // Kırmızıyı sil
-            labelElement.classList.add('text-success');   // Yeşil yap
-        } else {
-            // Eğer tikli değilse:
-            labelElement.innerText = "Proje Yayında Değil (Pasif)";
-            labelElement.classList.remove('text-success'); // Yeşili sil
-            labelElement.classList.add('text-danger');     // Kırmızı yap
+        // ─── IsActive switch label ─────────────────────────────────────────────────
+        const sw = document.getElementById('isActiveSwitch');
+        const lb = document.getElementById('isActiveLabel');
+        function syncLabel() {
+            lb.textContent = sw.checked ? 'Proje Yayında (Aktif)' : 'Proje Yayında Değil (Pasif)';
+            lb.className   = sw.checked ? 'form-check-label text-success fw-semibold'
+                                        : 'form-check-label text-danger fw-semibold';
         }
-    }
+        sw.addEventListener('change', syncLabel);
+        syncLabel();
 
-    // 3. Tıklanma olayını dinle (Her değiştiğinde çalışır)
-    switchElement.addEventListener('change', updateSwitchLabel);
+        // ─── Galeri: yeni dosya önizleme ──────────────────────────────────────────
+        document.getElementById('galleryInput').addEventListener('change', function() {
+            const preview = document.getElementById('galleryPreview');
+            preview.innerHTML = '';
+            const files = Array.from(this.files).slice(0, 10);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    preview.innerHTML += `
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <img src="${e.target.result}"
+                             style="width:100%;height:90px;object-fit:cover;border-radius:8px;opacity:0.8;border:2px dashed #696cff;" />
+                    </div>`;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
 
-    // 4. Sayfa ilk açıldığında da çalıştır (Update sayfasında Pasif gelirse doğru görünsün diye)
-    // Create sayfasında zaten checked geliyor ama Update için bu satır önemli.
-    updateSwitchLabel();
-</script>
+        // ─── Galeri: görseli sil (AJAX) ────────────────────────────────────────────
+        document.querySelectorAll('.btn-delete-gallery').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                if (!confirm('Bu galeri görselini silmek istediğinize emin misiniz?')) return;
+
+                const imageId = this.dataset.id;
+                const card    = this.closest('.gallery-item');
+
+                try {
+                    const res = await fetch('/Admin/Project/DeleteGalleryImage', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        },
+                        body: `imageId=${imageId}`
+                    });
+
+                    if (res.ok) {
+                        card.remove();
+                    } else {
+                        alert('Görsel silinemedi.');
+                    }
+                } catch(e) {
+                    alert('Hata: ' + e.message);
+                }
+            });
+        });
+    </script>
+}

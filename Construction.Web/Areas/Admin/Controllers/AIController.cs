@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Construction.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Editor")]
     public class AIController : Controller
     {
         private readonly IAIRecommendationService _aiService;
@@ -60,6 +60,7 @@ namespace Construction.Web.Areas.Admin.Controllers
 
         // POST: /Admin/AI/RegenerateAll  (toplu embedding yenileme)
         [HttpPost]
+        [Authorize(Roles = "Admin")] // Sadece Admin yapabilir
         public async Task<IActionResult> RegenerateAll()
         {
             try

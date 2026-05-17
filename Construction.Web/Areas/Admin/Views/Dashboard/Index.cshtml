@@ -1,4 +1,444 @@
-﻿@{
+﻿@model Construction.Web.Areas.Admin.Models.DashboardViewModel
+@{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dashboard";
+
+    // JSON serialize — Razor içinde güvenli kullanım için
+    var categoryLabels = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsByCategory.Select(x => x.Label));
+    var categoryValues = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsByCategory.Select(x => x.Value));
+    var statusLabels = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsByStatus.Select(x => x.Label));
+    var statusValues = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsByStatus.Select(x => x.Value));
+    var monthlyLabels = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsMonthly.Select(x => x.Label));
+    var monthlyValues = System.Text.Json.JsonSerializer.Serialize(Model.ProjectsMonthly.Select(x => x.Value));
+    var completionLabels = System.Text.Json.JsonSerializer.Serialize(Model.CompletionDistribution.Select(x => x.Label));
+    var completionValues = System.Text.Json.JsonSerializer.Serialize(Model.CompletionDistribution.Select(x => x.Value));
 }
-<h2>Burası Admin Paneli Dashboard</h2>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+    <!-- ══ SAYFA BAŞLIĞI ══ -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h4 class="fw-bold mb-1">Dashboard</h4>
+            <small class="text-muted">Hoş geldiniz, <strong>@User.Identity?.Name</strong> — @DateTime.Now.ToString("dd MMMM yyyy, dddd")</small>
+        </div>
+        <a asp-controller="AI" asp-action="Index" asp-area="Admin" class="btn btn-sm btn-primary">
+            <i class="bx bx-brain me-1"></i> AI Öneri Motoru
+        </a>
+    </div>
+
+    <!-- ══ ÖZET SAYAÇ KARTLARI ══ -->
+    <div class="row g-4 mb-4">
+        @{
+            var statCards = new[]
+            {
+                new { Icon="bx-building",     Label="Toplam Proje",       Value=Model.TotalProjects.ToString(),         Sub=$"{Model.ActiveProjects} aktif",                 Color="primary",  Href="/Admin/Project" },
+                new { Icon="bx-category",     Label="Kategoriler",        Value=Model.TotalCategories.ToString(),       Sub="Aktif kategoriler",                             Color="success",  Href="/Admin/Category" },
+                new { Icon="bx-chat",         Label="Yorumlar",           Value=Model.TotalTestimonials.ToString(),     Sub="Toplam testimonial",                            Color="info",     Href="/Admin/Testimonial" },
+                new { Icon="bx-user",         Label="Kullanıcılar",       Value=Model.TotalUsers.ToString(),            Sub="Kayıtlı kullanıcı",                             Color="warning",  Href="/Admin/UserManagement" },
+                new { Icon="bx-money",        Label="Portföy Değeri",     Value=Model.TotalPortfolioValue.ToString("N0") + " ₺", Sub="Aktif proje toplamı",               Color="danger",   Href="/Admin/Project" },
+                new { Icon="bx-brain",        Label="AI Embedding",       Value=$"{Model.EmbeddedProjectCount}/{Model.TotalProjects}", Sub=$"{Model.NotEmbeddedProjectCount} eksik", Color="secondary", Href="/Admin/AI" },
+                };
+        }
+        @foreach (var card in statCards)
+        {
+            <div class="col-6 col-lg-4 col-xl-2">
+                <a href="@card.Href" style="text-decoration:none;">
+                    <div class="card h-100 border-0 shadow-sm"
+                         style="transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;"
+                         onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                         onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='';">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <div class="avatar avatar-sm">
+                                    <span class="avatar-initial rounded bg-label-@card.Color">
+                                        <i class="bx @card.Icon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <h5 class="fw-bold mb-0">@card.Value</h5>
+                            <small class="fw-semibold text-@card.Color">@card.Label</small>
+                            <p class="text-muted mb-0 mt-1" style="font-size:0.75rem;">@card.Sub</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- ══ GRAFİK SATIRI 1: Aylık Trend + Kategori Dağılımı ══ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Aylık Proje Ekleme Trendi (Line) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold mb-0">Aylık Proje Trendi</h6>
+                            <small class="text-muted">Son 6 ay</small>
+                        </div>
+                        <span class="badge bg-label-primary">Line Chart</span>
+                    </div>
+                </div>
+                <div class="card-body pt-2">
+                    <canvas id="lineChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategoriye Göre Dağılım (Doughnut) -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h6 class="fw-bold mb-0">Kategori Dağılımı</h6>
+                    <small class="text-muted">Proje sayısına göre</small>
+                </div>
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <canvas id="doughnutChart" style="max-height:220px;"></canvas>
+                    <!-- Legend -->
+                    <div class="mt-3 w-100" id="doughnutLegend"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ GRAFİK SATIRI 2: Durum Dağılımı + Tamamlanma ══ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Proje Durumu (Bar) -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h6 class="fw-bold mb-0">Proje Durumu Dağılımı</h6>
+                    <small class="text-muted">Status'a göre gruplandırma</small>
+                </div>
+                <div class="card-body pt-2">
+                    <canvas id="barChart" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tamamlanma Oranı (Horizontal Bar) -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h6 class="fw-bold mb-0">Tamamlanma Oranı Dağılımı</h6>
+                    <small class="text-muted">Kaç proje hangi aşamada?</small>
+                </div>
+                <div class="card-body pt-2">
+                    <canvas id="horizontalBar" height="140"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TABLO SATIRI: Son Projeler + Son Yorumlar ══ -->
+    <div class="row g-4 mb-4">
+
+        <!-- Son Eklenen Projeler -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0">Son Eklenen Projeler</h6>
+                        <small class="text-muted">En son 5 proje</small>
+                    </div>
+                    <a asp-controller="Project" asp-action="Index" asp-area="Admin"
+                       class="btn btn-sm btn-outline-primary">Tümü</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background:#f8f9fc;">
+                                <tr>
+                                    <th class="ps-4 py-3 small fw-semibold text-muted">Proje</th>
+                                    <th class="py-3 small fw-semibold text-muted">Kategori</th>
+                                    <th class="py-3 small fw-semibold text-muted">Tamamlanma</th>
+                                    <th class="py-3 small fw-semibold text-muted">Durum</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.RecentProjects)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#696cff,#5a6acf);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                    <i class="bx bx-building text-white" style="font-size:1rem;"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold" style="font-size:0.87rem;">@p.Title</div>
+                                                    <small class="text-muted">@p.Location</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="badge bg-label-info">@(p.Category?.CategoryName ?? "-")</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <div style="width:80px;">
+                                                <div class="d-flex justify-content-between mb-1">
+                                                    <small class="text-muted" style="font-size:0.72rem;">%@p.CompleetionRate</small>
+                                                </div>
+                                                <div style="background:#eee;border-radius:10px;height:5px;">
+                                                    <div style="height:5px;width:@p.CompleetionRate%;background:@(p.CompleetionRate == 100 ? "#28c76f" : "#696cff");border-radius:10px;"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="badge @(p.IsActive ? "bg-label-success" : "bg-label-secondary")">
+                                                @(p.IsActive ? "Aktif" : "Pasif")
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!Model.RecentProjects.Any())
+                                {
+                                    <tr><td colspan="4" class="text-center text-muted py-4">Henüz proje eklenmemiş.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Son Yorumlar + AI Embedding Durumu -->
+        <div class="col-lg-5">
+
+            <!-- Son Yorumlar -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="fw-bold mb-0">Son Yorumlar</h6>
+                        <small class="text-muted">En son 5 testimonial</small>
+                    </div>
+                    <a asp-controller="Testimonial" asp-action="Index" asp-area="Admin"
+                       class="btn btn-sm btn-outline-primary">Tümü</a>
+                </div>
+                <div class="card-body pt-0">
+                    @foreach (var t in Model.RecentTestimonials)
+                    {
+                        <div class="d-flex gap-2 mb-3">
+                            <div style="width:38px;height:38px;background:#696cff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;flex-shrink:0;">
+                                @t.NameSurname[0]
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-semibold" style="font-size:0.85rem;">@t.NameSurname</span>
+                                    <div style="color:#ff9f43;">
+                                        @for (int i = 0; i < Math.Min(t.Rating, 5); i++)
+                                        {
+                                            <i class="bx bxs-star" style="font-size:0.75rem;"></i>
+                                        }
+                                    </div>
+                                </div>
+                                <p class="text-muted mb-0" style="font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                    @t.Comment
+                                </p>
+                            </div>
+                        </div>
+                    }
+                    @if (!Model.RecentTestimonials.Any())
+                    {
+                        <p class="text-center text-muted py-2 mb-0">Henüz yorum eklenmemiş.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- AI Embedding Durumu -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0">
+                    <h6 class="fw-bold mb-0"><i class="bx bx-brain me-1" style="color:#696cff;"></i>AI Embedding Durumu</h6>
+                </div>
+                <div class="card-body pt-0">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small text-muted">Embedding'li</span>
+                        <span class="small fw-semibold text-success">@Model.EmbeddedProjectCount proje</span>
+                    </div>
+                    <div style="background:#eee;border-radius:10px;height:10px;margin-bottom:0.75rem;">
+                        @{
+                            var pct = Model.TotalProjects > 0
+                            ? (int)(Model.EmbeddedProjectCount * 100.0 / Model.TotalProjects)
+                            : 0;
+                        }
+                        <div style="height:10px;width:@pct%;background:linear-gradient(90deg,#696cff,#28c76f);border-radius:10px;transition:width 1s;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <small class="text-muted">@pct% tamamlandı</small>
+                        @if (Model.NotEmbeddedProjectCount > 0)
+                        {
+                            <a asp-controller="AI" asp-action="RegenerateAll" asp-area="Admin"
+                               class="small text-warning fw-semibold text-decoration-none">
+                                <i class="bx bx-refresh me-1"></i>@Model.NotEmbeddedProjectCount eksik yenile
+                            </a>
+                        }
+                        else
+                        {
+                            <small class="text-success"><i class="bx bx-check-circle me-1"></i>Tümü hazır</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+    <script>
+        // ─── Ortak Renk Paleti ───────────────────────────────────────────────────────
+        const COLORS  = ['#696cff','#03c3ec','#28c76f','#ff9f43','#ea5455','#7367f0','#56ca00','#16d39a'];
+        const ALPHA   = (c, a) => c + Math.round(a * 255).toString(16).padStart(2,'0');
+
+        // ─── Veri (Razor'dan) ────────────────────────────────────────────────────────
+        const categoryLabels   = @Html.Raw(categoryLabels);
+        const categoryValues   = @Html.Raw(categoryValues);
+        const statusLabels     = @Html.Raw(statusLabels);
+        const statusValues     = @Html.Raw(statusValues);
+        const monthlyLabels    = @Html.Raw(monthlyLabels);
+        const monthlyValues    = @Html.Raw(monthlyValues);
+        const completionLabels = @Html.Raw(completionLabels);
+        const completionValues = @Html.Raw(completionValues);
+
+        // ─── 1) Aylık Trend — Line ───────────────────────────────────────────────────
+        new Chart(document.getElementById('lineChart'), {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Eklenen Proje',
+                    data: monthlyValues,
+                    borderColor: '#696cff',
+                    backgroundColor: 'rgba(105,108,255,0.08)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#696cff',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.45,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, color: '#a8aaae' },
+                        grid:  { color: '#f0f0f0' }
+                    },
+                    x: {
+                        ticks: { color: '#a8aaae' },
+                        grid:  { display: false }
+                    }
+                }
+            }
+        });
+
+        // ─── 2) Kategori Dağılımı — Doughnut ────────────────────────────────────────
+        const doughnutChart = new Chart(document.getElementById('doughnutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: COLORS.slice(0, categoryLabels.length),
+                    borderWidth: 0,
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '72%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` ${ctx.label}: ${ctx.parsed} proje`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Özel Legend
+        const legendEl = document.getElementById('doughnutLegend');
+        if (legendEl && categoryLabels.length) {
+            legendEl.innerHTML = categoryLabels.map((label, i) =>
+                `<div class="d-flex align-items-center justify-content-between mb-1">
+                    <div class="d-flex align-items-center gap-2">
+                        <div style="width:10px;height:10px;border-radius:50%;background:${COLORS[i]};flex-shrink:0;"></div>
+                        <small class="text-muted">${label}</small>
+                    </div>
+                    <small class="fw-semibold">${categoryValues[i]}</small>
+                </div>`
+            ).join('');
+        }
+
+        // ─── 3) Durum Dağılımı — Bar ─────────────────────────────────────────────────
+        new Chart(document.getElementById('barChart'), {
+            type: 'bar',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    label: 'Proje Sayısı',
+                    data: statusValues,
+                    backgroundColor: COLORS.slice(0, statusLabels.length).map(c => c + 'cc'),
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, color: '#a8aaae' },
+                        grid:  { color: '#f0f0f0' }
+                    },
+                    x: {
+                        ticks: { color: '#a8aaae' },
+                        grid:  { display: false }
+                    }
+                }
+            }
+        });
+
+        // ─── 4) Tamamlanma Dağılımı — Horizontal Bar ────────────────────────────────
+        new Chart(document.getElementById('horizontalBar'), {
+            type: 'bar',
+            data: {
+                labels: completionLabels,
+                datasets: [{
+                    label: 'Proje Sayısı',
+                    data: completionValues,
+                    backgroundColor: ['#ea5455cc','#ff9f43cc','#03c3eccc','#696cffcc','#28c76fcc'],
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, color: '#a8aaae' },
+                        grid:  { color: '#f0f0f0' }
+                    },
+                    y: {
+                        ticks: { color: '#a8aaae' },
+                        grid:  { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+}

@@ -49,6 +49,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IProjectDal, EFProjectDal>();
 builder.Services.AddScoped<ICategoryDal, EfCategoryDal>();
 
+builder.Services.AddScoped<IProjectImageDal, EfProjectImageDal>();
+builder.Services.AddScoped<IProjectImageService, ProjectImageManager>();
+
 builder.Services.AddScoped<IProjectService, ProjectManager>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
 

@@ -1,14 +1,20 @@
-﻿@model List<Project>
-
+﻿@model List<Construction.Entity.Entities.Project>
 @{
     ViewData["Title"] = "Projeler";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Proje Listesi</h5>
-        <a href="/Admin/Project/CreateProject" class="btn btn-primary">Yeni Proje Ekle</a>
+        <div>
+            <h5 class="mb-0">Proje Listesi</h5>
+            <small class="text-muted">@Model.Count proje</small>
+        </div>
+        @* Yeni Proje Ekle — Admin ve Editor *@
+        <a href="/Admin/Project/CreateProject" class="btn btn-primary">
+            <i class="bx bx-plus me-1"></i>Yeni Proje Ekle
+        </a>
     </div>
 
     <div class="table-responsive text-nowrap">
@@ -16,12 +22,14 @@
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Görsel</th>
                     <th>Proje Başlığı</th>
                     <th>Kategori</th>
                     <th>Lokasyon</th>
                     <th>Fiyat (Min)</th>
                     <th>Durum</th>
                     <th>Tamamlanma</th>
+                    <th>AI</th>
                     <th>İşlemler</th>
                 </tr>
             </thead>
@@ -29,7 +37,10 @@
                 @if (Model == null || Model.Count == 0)
                 {
                     <tr>
-                        <td colspan="7" class="text-center">Henüz veri yok.</td>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            <i class="bx bx-building fs-3 d-block mb-2"></i>
+                            Henüz veri yok.
+                        </td>
                     </tr>
                 }
                 else
@@ -38,35 +49,84 @@
                     {
                         <tr>
                             <td>@item.Id</td>
-                            <td><strong>@item.Title</strong></td>
-
-                            <td>@item.Category?.CategoryName</td>
-
-                            <td>@item.Location</td>
-
-                            <td>@item.MinPrice.ToString("C0")</td>
-
-                            <td><span class="badge bg-label-info">@item.ProjectStatus</span></td>
-
-                            <td style="width: 15%">
-                                <div class="d-flex align-items-center">
-                                    <span class="me-2">@item.CompleetionRate%</span>
-                                    <div class="progress w-100" style="height: 6px;">
-                                        <div class="progress-bar bg-success" role="progressbar"
-                                             style="width: @item.CompleetionRate%"
-                                             aria-valuenow="@item.CompleetionRate" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
                             <td>
-                                <a href="/Admin/Project/UpdateProject/@item.Id" class="btn btn-warning btn-sm"><i class="bx bx-edit-alt"></i></a>
-                                <a href="/Admin/Project/DeleteProject/@item.Id"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Bu projeyi ve kapak fotoğrafını kalıcı olarak silmek istediğinize emin misiniz?');">
-                                    <i class="bx bx-trash"></i>
+                                @if (!string.IsNullOrEmpty(item.CoverImageUrl) && item.CoverImageUrl != "no-image.jpg")
+                                {
+                                    <img src="/images/@item.CoverImageUrl"
+                                         style="width:50px;height:40px;object-fit:cover;border-radius:6px;" />
+                                }
+                                else
+                                {
+                                    <div style="width:50px;height:40px;background:#eee;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                                        <i class="bx bx-image text-muted"></i>
+                                    </div>
+                                }
+                        </td>
+                        <td>
+                            <strong>@item.Title</strong>
+                            <br />
+                            <small class="text-muted">
+                                @(item.IsActive
+                                                            ? Html.Raw("<span class='badge bg-label-success'>Aktif</span>")
+                                                            : Html.Raw("<span class='badge bg-label-secondary'>Pasif</span>"))
+                        </small>
+                    </td>
+                    <td>
+                        <span class="badge bg-label-info">@item.Category?.CategoryName</span>
+                    </td>
+                    <td>@item.Location</td>
+                    <td>@item.MinPrice.ToString("N0") ₺</td>
+                    <td>
+                        <span class="badge bg-label-primary">@item.ProjectStatus</span>
+                    </td>
+                    <td style="width:12%">
+                        <div class="d-flex align-items-center gap-1">
+                            <small class="text-muted">%@item.CompleetionRate</small>
+                            <div class="progress flex-grow-1" style="height:6px;">
+                                <div class="progress-bar bg-success"
+                                     style="width:@item.CompleetionRate%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.DetailsEmbedding))
+                                {
+                                    <span title="AI embedding mevcut">
+                                        <i class="bx bx-brain text-success"></i>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span title="AI embedding yok">
+                                        <i class="bx bx-brain text-muted"></i>
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @* Düzenle — Admin ve Editor *@
+                                <a href="/Admin/Project/UpdateProject/@item.Id"
+                                   class="btn btn-warning btn-sm" title="Düzenle">
+                                    <i class="bx bx-edit-alt"></i>
                                 </a>
+
+                                @* Sil — SADECE ADMIN *@
+                                @if (isAdmin)
+                                {
+                                    <a href="/Admin/Project/DeleteProject/@item.Id"
+                                       class="btn btn-danger btn-sm"
+                                       title="Sil"
+                                       onclick="return confirm('Bu projeyi silmek istediğinize emin misiniz?');">
+                                        <i class="bx bx-trash"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    @* Editor: Silme butonu devre dışı *@
+                                    <button class="btn btn-danger btn-sm opacity-25"
+                                            disabled title="Silme işlemi için Admin yetkisi gerekli">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }
