@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Model.Project.Title;
     var project = Model.Project;
+    var gallery = project.ProjectImages?.OrderBy(i => i.SortOrder).ToList() ?? new();
 }
 
 <!-- Breadcrumb -->
@@ -25,21 +26,112 @@
             <!-- ── Sol: Görsel + Detay ── -->
             <div class="col-lg-8">
 
-                <!-- Kapak Görseli -->
-                <div style="border-radius:20px;overflow:hidden;margin-bottom:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.12);">
-                    @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
-                    {
-                        <img src="/images/@project.CoverImageUrl" alt="@project.Title"
-                             style="width:100%;height:420px;object-fit:cover;" />
-                    }
-                    else
-                    {
-                        <div style="width:100%;height:420px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
-                            <i class="bi bi-building" style="font-size:5rem;color:rgba(255,255,255,0.25);"></i>
-                        </div>
-                    }
-                </div>
+                <!-- ════ GÖRSEL ALANI ════ -->
+                @if (gallery.Any())
+                {
+                    <!-- Galeri Slider (Bootstrap Carousel) -->
+                    <div id="projectCarousel" class="carousel slide mb-3"
+                         style="border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12);"
+                         data-bs-ride="carousel">
 
+                        <!-- Ana Slide'lar -->
+                        <div class="carousel-inner">
+                            <!-- Kapak görseli ilk slide -->
+                            <div class="carousel-item active">
+                                @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
+                                {
+                                    <img src="/images/@project.CoverImageUrl" alt="@project.Title"
+                                         style="width:100%;height:440px;object-fit:cover;" />
+                                }
+                                else
+                                {
+                                    <div style="width:100%;height:440px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-building" style="font-size:5rem;color:rgba(255,255,255,0.25);"></i>
+                                    </div>
+                                }
+                                <div class="carousel-caption d-none d-md-block pb-3"
+                                     style="background:linear-gradient(transparent,rgba(0,0,0,0.5));left:0;right:0;bottom:0;border-radius:0 0 0 0;padding:1rem;">
+                                    <small>Kapak Görseli · 1 / @(gallery.Count + 1)</small>
+                                </div>
+                            </div>
+
+                            <!-- Galeri görselleri -->
+                            @for (int i = 0; i < gallery.Count; i++)
+                            {
+                                <div class="carousel-item">
+                                    <img src="/images/@gallery[i].ImageUrl"
+                                         alt="@(gallery[i].Caption ?? project.Title)"
+                                         style="width:100%;height:440px;object-fit:cover;" />
+                                    <div class="carousel-caption d-none d-md-block pb-3"
+                                         style="background:linear-gradient(transparent,rgba(0,0,0,0.5));left:0;right:0;bottom:0;padding:1rem;">
+                                        <small>
+                                            @if (!string.IsNullOrEmpty(gallery[i].Caption))
+                                            {
+                                                @gallery[i].Caption <text> · </text>
+                                            }
+                                            @(i + 2) / @(gallery.Count + 1)
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Önceki / Sonraki butonları -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#projectCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#projectCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+
+                    <!-- Thumbnail Şeridi -->
+                    <div class="d-flex gap-2 mb-4 overflow-auto pb-1" id="thumbStrip">
+                        <!-- Kapak thumbnail -->
+                        <div class="thumb-item active" data-slide-to="0" data-bs-target="#projectCarousel"
+                             style="cursor:pointer;flex-shrink:0;">
+                            @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
+                            {
+                                <img src="/images/@project.CoverImageUrl"
+                                     style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:3px solid var(--primary);" />
+                            }
+                            else
+                            {
+                                <div style="width:80px;height:60px;border-radius:8px;background:#eee;display:flex;align-items:center;justify-content:center;border:3px solid var(--primary);">
+                                    <i class="bi bi-building text-muted"></i>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Galeri thumbnail'ları -->
+                        @for (int i = 0; i < gallery.Count; i++)
+                        {
+                            <div class="thumb-item" data-slide-to="@(i + 1)" data-bs-target="#projectCarousel"
+                                 style="cursor:pointer;flex-shrink:0;">
+                                <img src="/images/@gallery[i].ImageUrl"
+                                     style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:3px solid transparent;transition:border-color 0.2s;" />
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <!-- Galeri yoksa sadece kapak görseli -->
+                    <div style="border-radius:20px;overflow:hidden;margin-bottom:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.12);">
+                        @if (!string.IsNullOrEmpty(project.CoverImageUrl) && project.CoverImageUrl != "no-image.jpg")
+                        {
+                            <img src="/images/@project.CoverImageUrl" alt="@project.Title"
+                                 style="width:100%;height:420px;object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div style="width:100%;height:420px;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-building" style="font-size:5rem;color:rgba(255,255,255,0.25);"></i>
+                            </div>
+                        }
+                    </div>
+                }
+                <!-- ════ /GÖRSEL ALANI ════ -->
                 <!-- Başlık + Rozetler -->
                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
                     <div>
@@ -53,6 +145,12 @@
                         @if (project.Category != null)
                         {
                             <span class="badge bg-light text-dark border">@project.Category.CategoryName</span>
+                        }
+                        @if (gallery.Any())
+                        {
+                            <span class="badge bg-light text-muted border">
+                                <i class="bi bi-images me-1"></i>@(gallery.Count + 1) Fotoğraf
+                            </span>
                         }
                     </div>
                 </div>
@@ -79,10 +177,10 @@
                     @{
                         var infos = new[]
                         {
-                                        new { Icon="bi-calendar3",     Label="Eklenme Tarihi", Value=project.CreatedDate.ToString("dd MMMM yyyy") },
-                                        new { Icon="bi-tag",           Label="Kategori",       Value=project.Category?.CategoryName ?? "-" },
-                                        new { Icon="bi-geo-alt",       Label="Konum",          Value=project.Location },
-                                        new { Icon="bi-bar-chart",     Label="Tamamlanma",     Value=$"%{project.CompleetionRate}" },
+                                        new { Icon="bi-calendar3", Label="Eklenme Tarihi", Value=project.CreatedDate.ToString("dd MMMM yyyy") },
+                                        new { Icon="bi-tag",        Label="Kategori",       Value=project.Category?.CategoryName ?? "-" },
+                                        new { Icon="bi-geo-alt",    Label="Konum",          Value=project.Location },
+                                        new { Icon="bi-bar-chart",  Label="Tamamlanma",     Value=$"%{project.CompleetionRate}" },
                                         };
                     }
                     @foreach (var info in infos)
@@ -142,8 +240,6 @@
             <!-- ── Sağ: Fiyat + İletişim ── -->
             <div class="col-lg-4">
                 <div style="position:sticky;top:90px;">
-
-                    <!-- Fiyat Kartı -->
                     <div style="background:#fff;border-radius:20px;padding:2rem;box-shadow:0 8px 32px rgba(0,0,0,0.1);border-top:4px solid var(--accent);margin-bottom:1.5rem;">
                         <div class="text-center mb-3">
                             <div class="text-muted small">Başlangıç Fiyatı</div>
@@ -152,7 +248,6 @@
                             </div>
                         </div>
                         <hr />
-                        <!-- Mini İletişim Formu -->
                         <h6 class="fw-bold mb-3" style="font-family:'Inter',sans-serif;">Bilgi Alın</h6>
                         <div id="sideContactForm">
                             <input type="text" id="scName" class="form-control form-control-sm mb-2" placeholder="Adınız Soyadınız" />
@@ -167,11 +262,9 @@
                         </div>
                     </div>
 
-                    <!-- Hızlı İletişim -->
                     <div style="background:var(--bg-light);border-radius:16px;padding:1.25rem;">
                         <h6 class="fw-bold mb-3" style="font-family:'Inter',sans-serif;color:var(--primary);">Hızlı İletişim</h6>
-                        <a href="tel:+902120000000" class="d-flex align-items-center gap-2 text-decoration-none mb-2 p-2 rounded hover-bg"
-                           style="color:var(--text-dark);">
+                        <a href="tel:+902120000000" class="d-flex align-items-center gap-2 text-decoration-none mb-2 p-2 rounded" style="color:var(--text-dark);">
                             <div style="width:36px;height:36px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;">
                                 <i class="bi bi-telephone text-white"></i>
                             </div>
@@ -180,9 +273,7 @@
                                 <div class="fw-semibold small">+90 (212) 000 00 00</div>
                             </div>
                         </a>
-                        <a href="https://wa.me/905000000000" target="_blank"
-                           class="d-flex align-items-center gap-2 text-decoration-none p-2 rounded"
-                           style="color:var(--text-dark);">
+                        <a href="https://wa.me/905000000000" target="_blank" class="d-flex align-items-center gap-2 text-decoration-none p-2 rounded" style="color:var(--text-dark);">
                             <div style="width:36px;height:36px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;">
                                 <i class="bi bi-whatsapp text-white"></i>
                             </div>
@@ -200,43 +291,41 @@
         @if (Model.SimilarProjects.Any())
         {
             <hr class="my-5" />
-            <div>
-                <h4 class="mb-4" style="color:var(--primary);">
-                    <i class="bi bi-stars me-2" style="color:var(--accent);"></i>AI ile Benzer Projeler
-                </h4>
-                <div class="row g-4">
-                    @foreach (var sp in Model.SimilarProjects)
-                    {
-                        <div class="col-md-4">
-                            <div class="project-card card h-100">
-                                <div class="card-img-wrapper">
-                                    @if (!string.IsNullOrEmpty(sp.CoverImageUrl) && sp.CoverImageUrl != "no-image.jpg")
-                                    {
-                                        <img src="/images/@sp.CoverImageUrl" alt="@sp.Title" loading="lazy" />
-                                    }
-                                    else
-                                    {
-                                        <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
-                                            <i class="bi bi-building" style="font-size:2rem;color:rgba(255,255,255,0.3);"></i>
-                                        </div>
-                                    }
-                                    <span class="project-status-badge">@sp.ProjectStatus</span>
-                                </div>
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-1" style="color:var(--primary);font-family:'Inter',sans-serif;">@sp.Title</h6>
-                                    <p class="project-location mb-2"><i class="bi bi-geo-alt me-1"></i>@sp.Location</p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="project-price">@sp.MinPrice.ToString("N0") ₺</span>
-                                        <a asp-action="ProjectDetail" asp-route-id="@sp.Id"
-                                           class="btn btn-sm" style="background:var(--primary);color:#fff;border-radius:50px;font-size:0.82rem;">
-                                            İncele
-                                        </a>
+            <h4 class="mb-4" style="color:var(--primary);">
+                <i class="bi bi-stars me-2" style="color:var(--accent);"></i>AI ile Benzer Projeler
+            </h4>
+            <div class="row g-4">
+                @foreach (var sp in Model.SimilarProjects)
+                {
+                    <div class="col-md-4">
+                        <div class="project-card card h-100">
+                            <div class="card-img-wrapper">
+                                @if (!string.IsNullOrEmpty(sp.CoverImageUrl) && sp.CoverImageUrl != "no-image.jpg")
+                                {
+                                    <img src="/images/@sp.CoverImageUrl" alt="@sp.Title" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a3c5e,#2d6a9f);display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi bi-building" style="font-size:2rem;color:rgba(255,255,255,0.3);"></i>
                                     </div>
+                                }
+                                <span class="project-status-badge">@sp.ProjectStatus</span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="fw-bold mb-1" style="color:var(--primary);font-family:'Inter',sans-serif;">@sp.Title</h6>
+                                <p class="project-location mb-2"><i class="bi bi-geo-alt me-1"></i>@sp.Location</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="project-price">@sp.MinPrice.ToString("N0") ₺</span>
+                                    <a asp-action="ProjectDetail" asp-route-id="@sp.Id"
+                                       class="btn btn-sm" style="background:var(--primary);color:#fff;border-radius:50px;font-size:0.82rem;">
+                                        İncele
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                    }
-                </div>
+                    </div>
+                }
             </div>
         }
     </div>
@@ -244,6 +333,36 @@
 
 @section Scripts {
     <script>
+        // ─── Thumbnail tıklanınca carousel slide ─────────────────────────────────────
+        const carousel = document.getElementById('projectCarousel');
+        if (carousel) {
+            const bsCarousel = bootstrap.Carousel.getOrCreateInstance(carousel);
+            const thumbs     = document.querySelectorAll('.thumb-item');
+
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const slideTo = parseInt(thumb.dataset.slideTo);
+                    bsCarousel.to(slideTo);
+                });
+            });
+
+            // Carousel slide değişince aktif thumbnail'i güncelle
+            carousel.addEventListener('slid.bs.carousel', e => {
+                thumbs.forEach(t => {
+                    const img = t.querySelector('img, div');
+                    if (img) img.style.borderColor = 'transparent';
+                    t.classList.remove('active');
+                });
+                const activeThumb = thumbs[e.to];
+                if (activeThumb) {
+                    const img = activeThumb.querySelector('img, div');
+                    if (img) img.style.borderColor = 'var(--primary)';
+                    activeThumb.classList.add('active');
+                }
+            });
+        }
+
+        // ─── Bilgi talebi formu ───────────────────────────────────────────────────────
         document.getElementById('scSubmit').addEventListener('click', async () => {
             const name  = document.getElementById('scName').value.trim();
             const phone = document.getElementById('scPhone').value.trim();
@@ -265,7 +384,7 @@
                     })
                 });
                 document.getElementById('scSuccess').classList.remove('d-none');
-                document.getElementById('scName').value = '';
+                document.getElementById('scName').value  = '';
                 document.getElementById('scPhone').value = '';
                 document.getElementById('scEmail').value = '';
             } catch(e) {

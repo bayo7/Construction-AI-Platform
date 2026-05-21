@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Construction.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Editor")]
+    [Authorize(Roles = "Admin,Editor")]   // ← Editor de erişebilir
     public class TestimonialController : Controller
     {
         private readonly ITestimonialService _testimonialService;
@@ -22,40 +22,29 @@ namespace Construction.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var values = await _testimonialService.GetTestimonialsWithProjectAsync();
-            
             return View(values);
         }
-        // 1. Yorum Silme İşlemi
+
+        // Silme — SADECE Admin
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            // Silinecek yorumu buluyoruz
             var value = await _testimonialService.TGetByIdAsync(id);
-
             if (value != null)
-            {
                 await _testimonialService.TDeleteAsync(value);
-            }
 
-            // İşlem bitince listeye geri dönüyoruz
             return RedirectToAction("Index", "Testimonial", new { area = "Admin" });
         }
 
-        // 2. Durum Değiştirme (Onayla / Yayından Kaldır) İşlemi
+        // Durum değiştirme — Admin + Editor
         public async Task<IActionResult> ChangeStatus(int id)
         {
-            // Durumu değişecek yorumu buluyoruz
             var value = await _testimonialService.TGetByIdAsync(id);
-
             if (value != null)
             {
-                // Mevcut durumun tam tersini atıyoruz (! operatörü ile)
                 value.IsActive = !value.IsActive;
-
-                // Güncelleme işlemini yapıyoruz
                 await _testimonialService.TUpdateAsync(value);
             }
-
-            // İşlem bitince listeye geri dönüyoruz
             return RedirectToAction("Index", "Testimonial", new { area = "Admin" });
         }
     }
