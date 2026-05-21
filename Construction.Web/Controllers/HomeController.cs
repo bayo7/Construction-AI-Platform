@@ -1,4 +1,4 @@
-﻿using Construction.Business.Abstract;
+using Construction.Business.Abstract;
 using Construction.Entity.Entities;
 using Construction.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -170,6 +170,32 @@ namespace Construction.Web.Controllers
             }
         }
 
+        // POST: /Home/SubmitTestimonial  (AJAX — frontend yorum formu)
+        [HttpPost]
+        public async Task<IActionResult> SubmitTestimonial([FromBody] TestimonialFormModel form)
+        {
+            if (string.IsNullOrWhiteSpace(form?.NameSurname) || string.IsNullOrWhiteSpace(form?.Comment))
+                return BadRequest(new { success = false, message = "Ad soyad ve yorum alanları zorunludur." });
+
+            if (form.Rating < 1 || form.Rating > 5)
+                return BadRequest(new { success = false, message = "Geçerli bir puan seçin (1-5)." });
+
+            var testimonial = new Construction.Entity.Entities.Testimonial
+            {
+                NameSurname = form.NameSurname.Trim(),
+                Title       = form.Title?.Trim(),
+                Comment     = form.Comment.Trim(),
+                Rating      = form.Rating,
+                ProjectId   = form.ProjectId,
+                IsActive    = false,          // ← Admin onayı bekleniyor
+                CreatedDate = DateTime.Now
+            };
+
+            await _testimonialService.TInsertAsync(testimonial);
+
+            return Ok(new { success = true, message = "Yorumunuz alındı! İncelendikten sonra yayına alınacaktır." });
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
@@ -190,5 +216,14 @@ namespace Construction.Web.Controllers
         public string Phone { get; set; }
         public string Subject { get; set; }
         public string Message { get; set; }
+    }
+
+    public class TestimonialFormModel
+    {
+        public string NameSurname { get; set; }
+        public string? Title { get; set; }
+        public string Comment { get; set; }
+        public int Rating { get; set; }
+        public int? ProjectId { get; set; }
     }
 }

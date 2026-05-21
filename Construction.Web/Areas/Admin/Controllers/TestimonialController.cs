@@ -1,4 +1,4 @@
-﻿using Construction.Business.Abstract;
+using Construction.Business.Abstract;
 using Construction.Entity.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +23,31 @@ namespace Construction.Web.Areas.Admin.Controllers
         {
             var values = await _testimonialService.GetTestimonialsWithProjectAsync();
             return View(values);
+        }
+
+        // Yorum Ekleme — Admin + Editor
+        [HttpGet]
+        public async Task<IActionResult> CreateTestimonial()
+        {
+            var projects = await _projectService.GetProjectsWithCategory();
+            ViewBag.Projects = new SelectList(projects, "Id", "Title");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateTestimonial(Testimonial testimonial)
+        {
+            if (ModelState.IsValid)
+            {
+                testimonial.CreatedDate = DateTime.Now;
+                await _testimonialService.TInsertAsync(testimonial);
+                return RedirectToAction("Index", "Testimonial", new { area = "Admin" });
+            }
+
+            var projects = await _projectService.GetProjectsWithCategory();
+            ViewBag.Projects = new SelectList(projects, "Id", "Title", testimonial.ProjectId);
+            return View(testimonial);
         }
 
         // Silme — SADECE Admin

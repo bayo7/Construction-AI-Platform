@@ -1,4 +1,4 @@
-﻿using Construction.Business.Abstract;
+using Construction.Business.Abstract;
 using Construction.DataAccess.Abstract;
 using Construction.Entity.Entities;
 using Microsoft.Extensions.Configuration;
@@ -25,61 +25,75 @@ namespace Construction.Business.Concrete
 
         /// <summary>
         /// Gemini API ile metin → float[] vektör üretir.
+        /// API key tanımlı değilse veya istek başarısız olursa null döner (uygulama çökmez).
         /// </summary>
-        public async Task<float[]> GetEmbeddingAsync(string text)
+        public async Task<float[]?> GetEmbeddingAsync(string text)
         {
-            var apiKey = _configuration["GeminiAI:ApiKey"]
-                ?? throw new InvalidOperationException("GeminiAI:ApiKey appsettings.json'da tanımlı değil.");
+            var apiKey = _configuration["GeminiAI:ApiKey"];
 
-            // Gemini API URL'si (Query string olarak API key alıyor)
-            string requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{GeminiEmbeddingModel}:embedContent?key={apiKey}";
-
-            // Gemini'nin beklediği JSON formatı
-            var requestBody = new
+            // Key tanımlı değil veya şablon değer içeriyor — sessizce atla
+            if (string.IsNullOrWhiteSpace(apiKey) ||
+                apiKey.StartsWith("BURAYA_", StringComparison.OrdinalIgnoreCase))
             {
-                model = $"models/{GeminiEmbeddingModel}",
-                content = new
-                {
-                    parts = new[]
-                    {
-                        new { text = text }
-                    }
-                }
-            };
-
-            var json = JsonSerializer.Serialize(requestBody);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync(requestUrl, content);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorBody = await response.Content.ReadAsStringAsync();
-                throw new Exception($"Gemini AI API hatası: {response.StatusCode} - {errorBody}");
+                return null;
             }
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(responseJson);
+            try
+            {
+                // Gemini API URL'si (Query string olarak API key alıyor)
+                string requestUrl = $"https://generativelanguage.googleapis.com/v1beta/models/{GeminiEmbeddingModel}:embedContent?key={apiKey}";
 
-            // Gemini Yanıt Formatı: { "embedding": { "values": [0.1, 0.2, ...] } }
-            var embedding = doc.RootElement
-                .GetProperty("embedding")
-                .GetProperty("values")
-                .EnumerateArray()
-                .Select(e => e.GetSingle())
-                .ToArray();
+                // Gemini'nin beklediği JSON formatı
+                var requestBody = new
+                {
+                    model = $"models/{GeminiEmbeddingModel}",
+                    content = new
+                    {
+                        parts = new[]
+                        {
+                            new { text = text }
+                        }
+                    }
+                };
 
-            return embedding;
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(requestUrl, content);
+
+                if (!response.IsSuccessStatusCode)
+                    return null;  // API hatası — sessizce atla
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(responseJson);
+
+                // Gemini Yanıt Formatı: { "embedding": { "values": [0.1, 0.2, ...] } }
+                var embedding = doc.RootElement
+                    .GetProperty("embedding")
+                    .GetProperty("values")
+                    .EnumerateArray()
+                    .Select(e => e.GetSingle())
+                    .ToArray();
+
+                return embedding;
+            }
+            catch
+            {
+                return null;  // Beklenmedik hata — sessizce atla
+            }
         }
 
         /// <summary>
         /// Proje kaydedilirken/güncellenirken çağrılır.
+        /// API key yoksa veya hata oluşursa embedding sessizce atlanır, proje kaydı engellenmez.
         /// </summary>
         public async Task GenerateAndSaveEmbeddingAsync(Project project)
         {
             var textToEmbed = BuildProjectText(project);
             var embedding = await GetEmbeddingAsync(textToEmbed);
-            project.DetailsEmbedding = JsonSerializer.Serialize(embedding);
+            if (embedding != null)
+                project.DetailsEmbedding = JsonSerializer.Serialize(embedding);
+            // embedding null ise DetailsEmbedding alanı mevcut değerini korur
         }
 
         /// <summary>
@@ -88,6 +102,11 @@ namespace Construction.Business.Concrete
         public async Task<List<ProjectRecommendationResult>> GetRecommendationsAsync(string userQuery, int topN = 5)
         {
             var queryEmbedding = await GetEmbeddingAsync(userQuery);
+
+            // API key yoksa veya embedding alınamadıysa boş liste döndür
+            if (queryEmbedding == null)
+                return new List<ProjectRecommendationResult>();
+
             var allProjects = await _projectDal.GetProjectsWithCategory();
             var results = new List<ProjectRecommendationResult>();
 

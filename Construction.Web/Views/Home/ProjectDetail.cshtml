@@ -1,4 +1,4 @@
-﻿@model Construction.Web.Models.ProjectDetailViewModel
+@model Construction.Web.Models.ProjectDetailViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = Model.Project.Title;
@@ -235,7 +235,79 @@
                         </div>
                     </div>
                 }
+
+                @* ════ YORUM FORMU ════ *@
+                <div id="testimonialFormSection" style="margin-top:2.5rem;">
+                    <h5 class="fw-bold mb-1" style="color:var(--primary);font-family:'Inter',sans-serif;">
+                        <i class="bi bi-pencil-square me-2"></i>Yorum Bırakın
+                    </h5>
+                    <p class="text-muted small mb-4">Yorumunuz incelendikten sonra yayına alınacaktır.</p>
+
+                    <div id="testimonialSuccess" class="d-none"
+                         style="background:linear-gradient(135deg,#d4edda,#c3e6cb);border-radius:16px;padding:2rem;text-align:center;border:1px solid #b8dacc;">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size:2.5rem;"></i>
+                        <h6 class="fw-bold mt-3 mb-1 text-success">Teşekkürler!</h6>
+                        <p class="text-muted small mb-0">Yorumunuz alındı. Ekibimiz inceledikten sonra sayfada görünecektir.</p>
+                    </div>
+
+                    <div id="testimonialForm"
+                         style="background:#fff;border-radius:20px;padding:2rem;box-shadow:0 4px 24px rgba(0,0,0,0.07);border:1px solid var(--border);">
+
+                        @* Yıldız Seçici *@
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Puanınız <span class="text-danger">*</span></label>
+                            <div class="d-flex gap-1" id="starPicker">
+                                @for (int s = 1; s <= 5; s++)
+                                {
+                                    <i class="bi bi-star star-pick"
+                                       data-val="@s"
+                                       style="font-size:1.8rem;cursor:pointer;color:#ddd;transition:color 0.15s,transform 0.15s;"></i>
+                                }
+                            </div>
+                            <input type="hidden" id="tRating" value="0" />
+                            <div id="ratingError" class="text-danger small d-none mt-1">Lütfen bir puan seçin.</div>
+                        </div>
+
+                        @* Ad Soyad + Unvan *@
+                        <div class="row g-3 mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small">Ad Soyad <span class="text-danger">*</span></label>
+                                <input type="text" id="tName" class="form-control"
+                                       placeholder="Örn: Ahmet Yılmaz" maxlength="100" />
+                                <div id="nameError" class="text-danger small d-none mt-1">Bu alan zorunludur.</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label fw-semibold small">Unvan <span class="text-muted fw-normal">(İsteğe bağlı)</span></label>
+                                <input type="text" id="tTitle" class="form-control"
+                                       placeholder="Örn: Ev Sahibi, Yatırımcı..." maxlength="80" />
+                            </div>
+                        </div>
+
+                        @* Yorum Metni *@
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold small">Yorumunuz <span class="text-danger">*</span></label>
+                            <textarea id="tComment" class="form-control" rows="4"
+                                      placeholder="Bu proje hakkındaki deneyimlerinizi paylaşın..."
+                                      maxlength="1000" style="resize:vertical;"></textarea>
+                            <div class="d-flex justify-content-between">
+                                <div id="commentError" class="text-danger small d-none mt-1">Bu alan zorunludur.</div>
+                                <small class="text-muted mt-1 ms-auto" id="charCount">0 / 1000</small>
+                            </div>
+                        </div>
+
+                        @* Gönder Butonu *@
+                        <button id="tSubmit" class="btn px-4 py-2"
+                                style="background:var(--primary);color:#fff;border-radius:50px;font-weight:600;letter-spacing:0.3px;">
+                            <i class="bi bi-send me-2"></i>Yorumu Gönder
+                        </button>
+
+                        <div id="tError" class="alert alert-danger mt-3 d-none small"></div>
+                    </div>
+                </div>
+                @* ════ /YORUM FORMU ════ *@
+
             </div>
+
 
             <!-- ── Sağ: Fiyat + İletişim ── -->
             <div class="col-lg-4">
@@ -394,5 +466,94 @@
                 btn.innerHTML = '<i class="bi bi-send me-1"></i>Bilgi Talep Et';
             }
         });
+
+        // ─── Yorum Formu ─────────────────────────────────────────────────────────────
+        (function () {
+            const stars      = document.querySelectorAll('.star-pick');
+            const ratingInput = document.getElementById('tRating');
+            const ratingError = document.getElementById('ratingError');
+
+            // Yıldız hover & tıklama
+            stars.forEach(star => {
+                star.addEventListener('mouseenter', () => highlightStars(parseInt(star.dataset.val), false));
+                star.addEventListener('mouseleave', () => highlightStars(parseInt(ratingInput.value), true));
+                star.addEventListener('click', () => {
+                    ratingInput.value = star.dataset.val;
+                    highlightStars(parseInt(star.dataset.val), true);
+                    ratingError.classList.add('d-none');
+                });
+            });
+
+            function highlightStars(count, permanent) {
+                stars.forEach((s, idx) => {
+                    const filled = idx < count;
+                    s.className = filled
+                        ? 'bi bi-star-fill star-pick'
+                        : 'bi bi-star star-pick';
+                    s.style.color     = filled ? '#f5a623' : '#ddd';
+                    s.style.transform = (filled && permanent) ? 'scale(1.15)' : 'scale(1)';
+                });
+            }
+
+            // Karakter sayacı
+            const tComment  = document.getElementById('tComment');
+            const charCount = document.getElementById('charCount');
+            tComment.addEventListener('input', () => {
+                charCount.textContent = tComment.value.length + ' / 1000';
+            });
+
+            // Form gönder
+            document.getElementById('tSubmit').addEventListener('click', async () => {
+                const nameSurname = document.getElementById('tName').value.trim();
+                const title       = document.getElementById('tTitle').value.trim();
+                const comment     = tComment.value.trim();
+                const rating      = parseInt(ratingInput.value);
+
+                // Doğrulama
+                let valid = true;
+                document.getElementById('nameError').classList.toggle('d-none', !!nameSurname);
+                document.getElementById('commentError').classList.toggle('d-none', !!comment);
+                ratingError.classList.toggle('d-none', rating >= 1);
+                if (!nameSurname || !comment || rating < 1) valid = false;
+                if (!valid) return;
+
+                const btn = document.getElementById('tSubmit');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Gönderiliyor...';
+                document.getElementById('tError').classList.add('d-none');
+
+                try {
+                    const res = await fetch('/Home/SubmitTestimonial', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nameSurname,
+                            title: title || null,
+                            comment,
+                            rating,
+                            projectId: @project.Id
+                        })
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        document.getElementById('testimonialForm').classList.add('d-none');
+                        document.getElementById('testimonialSuccess').classList.remove('d-none');
+                        document.getElementById('testimonialSuccess').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        const errEl = document.getElementById('tError');
+                        errEl.textContent = data.message || 'Bir hata oluştu.';
+                        errEl.classList.remove('d-none');
+                    }
+                } catch (e) {
+                    const errEl = document.getElementById('tError');
+                    errEl.textContent = 'Sunucuya ulaşılamadı, lütfen tekrar deneyin.';
+                    errEl.classList.remove('d-none');
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-send me-2"></i>Yorumu Gönder';
+                }
+            });
+        })();
     </script>
 }

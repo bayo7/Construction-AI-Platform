@@ -1,0 +1,127 @@
+@model Construction.Entity.Entities.Testimonial
+
+@{
+    ViewData["Title"] = "Yeni Müşteri Yorumu Ekle";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xl">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Yeni Müşteri Yorumu</h5>
+                <small class="text-muted float-end">Manuel yorum girişi</small>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/Admin/Testimonial/CreateTestimonial">
+                    @Html.AntiForgeryToken()
+
+                    @* Ad Soyad *@
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="NameSurname">Ad Soyad <span class="text-danger">*</span></label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text"><i class="bx bx-user"></i></span>
+                            <input type="text" class="form-control" asp-for="NameSurname"
+                                   placeholder="Örn: Ahmet Yılmaz" />
+                        </div>
+                        <span asp-validation-for="NameSurname" class="text-danger small"></span>
+                    </div>
+
+                    @* Unvan / Görev *@
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Title">Unvan / Görev</label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text"><i class="bx bx-briefcase"></i></span>
+                            <input type="text" class="form-control" asp-for="Title"
+                                   placeholder="Örn: Şirket Müdürü, Ev Sahibi..." />
+                        </div>
+                        <span asp-validation-for="Title" class="text-danger small"></span>
+                    </div>
+
+                    @* Puan *@
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Rating">Puan (1-5) <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-3 align-items-center">
+                            <div class="input-group input-group-merge" style="max-width:160px;">
+                                <span class="input-group-text"><i class="bx bx-star"></i></span>
+                                <input type="number" class="form-control" asp-for="Rating"
+                                       min="1" max="5" id="ratingInput" />
+                            </div>
+                            <div id="starPreview" class="text-warning fs-5"></div>
+                        </div>
+                        <span asp-validation-for="Rating" class="text-danger small"></span>
+                    </div>
+
+                    @* Yorum *@
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Comment">Yorum <span class="text-danger">*</span></label>
+                        <textarea class="form-control" asp-for="Comment" rows="4"
+                                  placeholder="Müşteri yorumunu buraya girin..."></textarea>
+                        <span asp-validation-for="Comment" class="text-danger small"></span>
+                    </div>
+
+                    @* İlgili Proje (Opsiyonel) *@
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="ProjectId">İlgili Proje <span class="text-muted">(İsteğe bağlı)</span></label>
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text"><i class="bx bx-building-house"></i></span>
+                            <select class="form-select" asp-for="ProjectId"
+                                    asp-items="ViewBag.Projects">
+                                <option value="">-- Bağımsız Yorum (Projeye bağlı değil) --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @* Durum *@
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" asp-for="IsActive"
+                               id="isActiveSwitch" />
+                        <label class="form-check-label" for="isActiveSwitch" id="isActiveLabel">
+                            Yayında (Aktif)
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bx bx-save me-1"></i>Kaydet
+                        </button>
+                        <a href="/Admin/Testimonial/Index" class="btn btn-outline-secondary">
+                            <i class="bx bx-arrow-back me-1"></i>İptal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Yıldız önizleme
+    const ratingInput = document.getElementById('ratingInput');
+    const starPreview = document.getElementById('starPreview');
+
+    function updateStars() {
+        const val = parseInt(ratingInput.value) || 0;
+        starPreview.textContent = '★'.repeat(Math.min(Math.max(val, 0), 5));
+    }
+
+    ratingInput.addEventListener('input', updateStars);
+    updateStars();
+
+    // Durum etiketi
+    const switchEl = document.getElementById('isActiveSwitch');
+    const labelEl  = document.getElementById('isActiveLabel');
+
+    function updateLabel() {
+        if (switchEl.checked) {
+            labelEl.textContent = 'Yayında (Aktif)';
+            labelEl.className = 'form-check-label text-success';
+        } else {
+            labelEl.textContent = 'Yayında Değil (Pasif)';
+            labelEl.className = 'form-check-label text-danger';
+        }
+    }
+
+    switchEl.addEventListener('change', updateLabel);
+    updateLabel();
+</script>

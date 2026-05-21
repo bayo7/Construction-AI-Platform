@@ -1,9 +1,10 @@
-﻿@using Construction.Entity.Entities
+@using Construction.Entity.Entities
 @model List<Category>
 
 @{
     ViewData["Title"] = "Kategoriler";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    bool isAdmin = User.IsInRole("Admin");
 }
 
 <div class="card">
@@ -48,9 +49,24 @@
                             </td>
                             <td>
                                 <a href="/Admin/Category/UpdateCategory/@item.Id" class="btn btn-sm btn-outline-info">Düzenle</a>
-                                <a href="/Admin/Category/DeleteCategory/@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
-                                    <i class="bx bx-trash"></i> Sil
-                                </a>
+
+                                @* Sil — SADECE ADMIN *@
+                                @if (isAdmin)
+                                {
+                                    <a href="/Admin/Category/DeleteCategory/@item.Id"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Bu kategoriyi silmek istediğinize emin misiniz?');">
+                                        <i class="bx bx-trash"></i> Sil
+                                    </a>
+                                }
+                                else
+                                {
+                                    @* Editor: Silme butonu devre dışı *@
+                                    <button class="btn btn-danger btn-sm opacity-25"
+                                            disabled title="Silme işlemi için Admin yetkisi gerekli">
+                                        <i class="bx bx-trash"></i> Sil
+                                    </button>
+                                }
                             </td>
                         </tr>
                     }

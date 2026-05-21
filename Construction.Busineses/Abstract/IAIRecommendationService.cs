@@ -1,4 +1,4 @@
-﻿using Construction.Entity.Entities;
+using Construction.Entity.Entities;
 
 namespace Construction.Business.Abstract
 {
@@ -7,7 +7,7 @@ namespace Construction.Business.Abstract
         /// <summary>
         /// Verilen metin için Anthropic API üzerinden embedding vektörü üretir.
         /// </summary>
-        Task<float[]> GetEmbeddingAsync(string text);
+        Task<float[]?> GetEmbeddingAsync(string text);
 
         /// <summary>
         /// Proje ekleme/güncellemede çağrılır; projenin DetailsEmbedding alanını doldurur.
